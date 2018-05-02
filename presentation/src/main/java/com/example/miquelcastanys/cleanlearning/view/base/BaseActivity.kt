@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.navigation.Navigator
+import kotlinx.android.synthetic.main.activity_base.*
 import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity() {
@@ -21,9 +22,14 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base)
+        setToolbar()
         setupActivityComponent()
         initializeFragmentAndTAG(savedInstanceState)
         beginTransaction()
+    }
+
+    private fun setToolbar() {
+        setSupportActionBar(toolbar)
     }
 
 
@@ -49,5 +55,9 @@ abstract class BaseActivity : AppCompatActivity() {
 
     private fun setupActivityComponent() {
         MostPopularMoviesApplication.applicationModule.inject(this)
+    }
+
+    protected fun setToolbarTitle(title: String) {
+        supportActionBar?.title = title
     }
 }

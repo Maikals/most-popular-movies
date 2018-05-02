@@ -6,11 +6,12 @@ import com.example.miquelcastanys.cleanlearning.view.base.BaseActivity
 
 class MostPopularMoviesActivity : BaseActivity() {
     override fun createFragmentAndSettingTAG() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        currentFragment = MostPopularMoviesFragment.newInstance()
+        currentTag = MostPopularMoviesFragment.TAG
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_most_pupular_movies)
+        setTitle(R.string.app_name)
     }
 }
