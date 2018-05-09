@@ -1,5 +1,3 @@
 package com.example.miquelcastanys.cleanlearning.entities
 
-
-class Entity {
-}
+class FooterEntity : BaseListEntity()
