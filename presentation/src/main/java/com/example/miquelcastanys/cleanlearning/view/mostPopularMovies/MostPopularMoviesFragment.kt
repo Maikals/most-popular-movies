@@ -71,15 +71,19 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         attachScrollListener()
     }
 
-    private fun setRefreshLayoutBehaviour() {
+    private fun setRefreshLayoutBehaviour() =
         swipeRefreshLayout.setOnRefreshListener {
             //call service
         }
+
+
+    override fun stopRefreshLayout() {
+        swipeRefreshLayout.isRefreshing = false
     }
 
-    private fun attachScrollListener() {
+    private fun attachScrollListener() =
         mostPopularMoviesRV.addOnScrollListener(onScrollListener)
-    }
+
 
     override fun showRecyclerView() {
         mostPopularMoviesRV.visibility = View.VISIBLE
@@ -108,7 +112,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         mostPopularMoviesRV.adapter.notifyDataSetChanged()
     }
 
-    private fun unattachScrollListener() {
+    private fun unattachScrollListener() =
         mostPopularMoviesRV.removeOnScrollListener(onScrollListener)
-    }
 }
