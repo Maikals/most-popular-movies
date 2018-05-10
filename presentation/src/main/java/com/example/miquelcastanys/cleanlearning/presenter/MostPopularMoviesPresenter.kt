@@ -29,27 +29,44 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
         mostPopularMoviesUseCase.execute(currentPage++, object : MostPopularMoviesUseCase.Callback {
             override fun onReceived(moviesListEntity: MovieListEntity) {
-                if (refreshList) moviesList.clear()
-                setIsLastPage(currentPage, moviesListEntity.totalPages)
-                addResultToTvShowList(MoviesListPresentationMapper.toPresentationObject(moviesListEntity))
-                removeFooter()
-                if (!isLastPage) addFooter()
-                view.setItems(moviesList)
-                view.hideEmptyView()
-                view.showRecyclerView()
-                view.setLoadingState(false)
-                view.showProgressBar(false)
+
+                manageMovieListEntityReceived(refreshList, moviesListEntity)
+                if (moviesListEntity.moviesList.isNotEmpty()) {
+                    manageList()
+                } else {
+                    manageEmptyList()
+                }
 
             }
 
-            override fun onError() {
-                view.showProgressBar(false)
-                view.hideRecyclerView()
-                view.showEmptyView()
-                view.setLoadingState(false)
-            }
+            override fun onError() =
+                manageEmptyList()
 
         })
+    }
+
+    private fun manageMovieListEntityReceived(refreshList: Boolean, moviesListEntity: MovieListEntity) {
+        if (refreshList) moviesList.clear()
+        setIsLastPage(currentPage, moviesListEntity.totalPages)
+        addResultToTvShowList(MoviesListPresentationMapper.toPresentationObject(moviesListEntity))
+    }
+
+    private fun manageList() {
+        removeFooter()
+        if (!isLastPage) addFooter()
+        view.setItems(moviesList)
+        view.hideEmptyView()
+        view.showRecyclerView()
+        view.setLoadingState(false)
+        view.showProgressBar(false)
+    }
+
+    private fun manageEmptyList() {
+        currentPage = 1
+        view.showProgressBar(false)
+        view.hideRecyclerView()
+        view.showEmptyView()
+        view.setLoadingState(false)
     }
 
 
