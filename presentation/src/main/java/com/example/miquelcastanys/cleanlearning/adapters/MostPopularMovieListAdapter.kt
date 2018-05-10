@@ -38,11 +38,17 @@ class MostPopularMovieListAdapter(val movieList: List<BaseListEntity>) : Recycle
 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as? MovieViewHolder)?.bindView(movieList[position] as MovieEntity)
-        setAnimation((holder as? MovieViewHolder)?.view!!, position)
+        if (holder is MovieViewHolder && holder.view != null) {
+            holder.bindView(movieList[position] as MovieEntity)
+            setAnimation(holder.view, position)
+        }
     }
 
-    fun setAnimation(viewToAnimate: View, position: Int) {
+    fun restartLastPosition() {
+        lastPosition = -1
+    }
+
+    private fun setAnimation(viewToAnimate: View, position: Int) {
         if (position > lastPosition) {
             val animation = AnimationUtils.loadAnimation(viewToAnimate.context, R.anim.slide_in_right)
             viewToAnimate.startAnimation(animation)

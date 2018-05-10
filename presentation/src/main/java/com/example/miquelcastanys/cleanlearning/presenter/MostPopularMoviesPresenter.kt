@@ -1,6 +1,5 @@
 package com.example.miquelcastanys.cleanlearning.presenter
 
-import android.util.Log
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.domain.interactor.MostPopularMoviesUseCase
@@ -29,37 +28,36 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
     fun getMostPopularMoviesList(refreshList: Boolean = false) {
 
         mostPopularMoviesUseCase.execute(currentPage++, object : MostPopularMoviesUseCase.Callback {
-            override fun onReceived(moviesList: MovieListEntity) {
-
-                view.setItems(MoviesListPresentationMapper.toPresentationObject(moviesList))
-                view.showProgressBar(false)
+            override fun onReceived(moviesListEntity: MovieListEntity) {
+                if (refreshList) moviesList.clear()
+                setIsLastPage(currentPage, moviesListEntity.totalPages)
+                addResultToTvShowList(MoviesListPresentationMapper.toPresentationObject(moviesListEntity))
+                removeFooter()
+                if (!isLastPage) addFooter()
+                view.setItems(moviesList)
+                view.hideEmptyView()
                 view.showRecyclerView()
+                view.setLoadingState(false)
+                view.showProgressBar(false)
 
             }
 
             override fun onError() {
-
+                view.showProgressBar(false)
+                view.hideRecyclerView()
+                view.showEmptyView()
+                view.setLoadingState(false)
             }
 
         })
     }
 
-    private fun createDummyArray(): List<BaseListEntity> {
-        val array = ArrayList<BaseListEntity>()
-        array.add(com.example.miquelcastanys.cleanlearning.entities.MovieEntity("Guardianes de la Galaxia", 2.5, ""))
-        array.add(com.example.miquelcastanys.cleanlearning.entities.MovieEntity("Guardianes de la Galaxia", 2.5, ""))
-        array.add(com.example.miquelcastanys.cleanlearning.entities.MovieEntity("Guardianes de la Galaxia", 2.5, ""))
-        array.add(com.example.miquelcastanys.cleanlearning.entities.MovieEntity("Guardianes de la Galaxia", 2.5, ""))
-        array.add(com.example.miquelcastanys.cleanlearning.entities.MovieEntity("Guardianes de la Galaxia", 2.5, ""))
-
-        return array
-    }
 
     private fun addFooter() {
         moviesList.add(FooterEntity())
     }
 
-    private fun addResultToTvShowList(tvShowListResult: ArrayList<BaseListEntity>) {
+    private fun addResultToTvShowList(tvShowListResult: List<BaseListEntity>) {
         moviesList.addAll(tvShowListResult)
     }
 

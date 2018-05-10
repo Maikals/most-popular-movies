@@ -1,5 +1,6 @@
 package com.example.data.net.interceptor
 
+import com.example.data.BuildConfig
 import com.example.data.entity.ApiKeyContainer
 import com.example.data.net.ApiConstants
 import okhttp3.Interceptor
@@ -21,7 +22,7 @@ class RequestInterceptor @Inject constructor() : Interceptor {
 
         url = urlBuilder?.build()
         request = request?.newBuilder()?.url(url!!)?.build()
-        println("URl -> " + request?.url())
+        if (BuildConfig.DEBUG) println("URl -> " + request?.url())
         return chain?.proceed(request!!)!!
     }
 }

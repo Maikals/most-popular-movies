@@ -5,7 +5,7 @@ import com.example.domain.entity.MovieListEntity
 interface MostPopularMoviesUseCase {
 
     interface Callback {
-        fun onReceived(movieList: MovieListEntity)
+        fun onReceived(moviesListEntity: MovieListEntity)
         fun onError()
     }
 

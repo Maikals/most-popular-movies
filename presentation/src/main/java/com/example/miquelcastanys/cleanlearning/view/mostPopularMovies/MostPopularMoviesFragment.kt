@@ -89,6 +89,8 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     private fun setRefreshLayoutBehaviour() =
         swipeRefreshLayout.setOnRefreshListener {
+            loading = true
+            (mostPopularMoviesRV.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()
             presenter.start()
         }
 
@@ -105,7 +107,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     override fun hideEmptyView() {
         emptyView.visibility = View.GONE
-
     }
 
     override fun showEmptyView() {
@@ -119,7 +120,12 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     override fun setItems(moviesList: List<BaseListEntity>) {
         if (mostPopularMoviesRV.adapter == null) mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(moviesList)
+
         mostPopularMoviesRV.adapter.notifyDataSetChanged()
+    }
+
+    override fun setLoadingState(state: Boolean) {
+        loading = state
     }
 
     private fun unattachScrollListener() =
