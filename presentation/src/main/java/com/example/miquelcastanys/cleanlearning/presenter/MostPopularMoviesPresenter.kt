@@ -1,15 +1,18 @@
 package com.example.miquelcastanys.cleanlearning.presenter
 
-import com.example.domain.entity.MovieEntity
+import android.util.Log
+import com.example.domain.entity.MovieListEntity
+import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.domain.interactor.MostPopularMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.entities.BaseListEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterEntity
+import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
 import com.example.miquelcastanys.cleanlearning.injector.PerFragment
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesView
 import javax.inject.Inject
 
 @PerFragment
-class MostPopularMoviesPresenter @Inject constructor(/*private val mostPopularMoviesUseCase: MostPopularMoviesUseCase*/) {
+class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCase: GetMostPopularMoviesUseCase) {
 
     @Inject
     lateinit var view: MostPopularMoviesView
@@ -24,34 +27,30 @@ class MostPopularMoviesPresenter @Inject constructor(/*private val mostPopularMo
     }
 
     fun getMostPopularMoviesList(refreshList: Boolean = false) {
-        view.setItems(createDummyArray())
-        view.showRecyclerView()
-        view.showProgressBar(false)
-        /*mostPopularMoviesUseCase.execute(currentPage++, object : MostPopularMoviesUseCase.Callback {
-            override fun onReceived(moviesList: List<MovieEntity>) {
-                view.setItems(createDummyArray())
+
+        mostPopularMoviesUseCase.execute(currentPage++, object : MostPopularMoviesUseCase.Callback {
+            override fun onReceived(moviesList: MovieListEntity) {
+
+                view.setItems(MoviesListPresentationMapper.toPresentationObject(moviesList))
                 view.showProgressBar(false)
+                view.showRecyclerView()
+
             }
 
             override fun onError() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
-        })*/
+        })
     }
 
     private fun createDummyArray(): List<BaseListEntity> {
         val array = ArrayList<BaseListEntity>()
-        array.add(com.example.miquelcastanys.cleanlearning.entities.
-                MovieEntity("Guardianes de la Galaxia", "2.5", ""))
-        array.add(com.example.miquelcastanys.cleanlearning.entities.
-                MovieEntity("Guardianes de la Galaxia", "2.5", ""))
-        array.add(com.example.miquelcastanys.cleanlearning.entities.
-                MovieEntity("Guardianes de la Galaxia", "2.5", ""))
-        array.add(com.example.miquelcastanys.cleanlearning.entities.
-                MovieEntity("Guardianes de la Galaxia", "2.5", ""))
-        array.add(com.example.miquelcastanys.cleanlearning.entities.
-                MovieEntity("Guardianes de la Galaxia", "2.5", ""))
+        array.add(com.example.miquelcastanys.cleanlearning.entities.MovieEntity("Guardianes de la Galaxia", 2.5, ""))
+        array.add(com.example.miquelcastanys.cleanlearning.entities.MovieEntity("Guardianes de la Galaxia", 2.5, ""))
+        array.add(com.example.miquelcastanys.cleanlearning.entities.MovieEntity("Guardianes de la Galaxia", 2.5, ""))
+        array.add(com.example.miquelcastanys.cleanlearning.entities.MovieEntity("Guardianes de la Galaxia", 2.5, ""))
+        array.add(com.example.miquelcastanys.cleanlearning.entities.MovieEntity("Guardianes de la Galaxia", 2.5, ""))
 
         return array
     }

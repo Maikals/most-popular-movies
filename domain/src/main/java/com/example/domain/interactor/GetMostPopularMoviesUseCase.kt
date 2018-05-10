@@ -1,5 +1,3 @@
-package com.example.miquelcastanys.cleanlearning.entities.mapper
-
 /*            _MMMMM`
  *     __MMMMMMMMM`       J        openTrends Solucions i Sistemes, S.L.
  * JMMMMMMMMMMMMF       JM         http://www.opentrends.net
@@ -10,7 +8,7 @@ package com.example.miquelcastanys.cleanlearning.entities.mapper
  * MMMMMMMMMMMMMF`     .JMM`       Spain
  * MMMMMMMMMM"     _MMMMMF
  * M4MMM""`   ._MMMMMMMM`          *************************************
- * _______MMMMMMMMMMMF             CleanLearning
+ * _______MMMMMMMMMMMF             most-popular-movies
  * MMMMMMMMMMMMMMMM"               *************************************
  * MMMMMMMMMMMMF"                  Copyright (C) 2018 openTrends, Tots els drets reservats
  * MMMMMMMM""                      Copyright (C) 2018 openTrends, All Rights Reserved
@@ -29,5 +27,27 @@ package com.example.miquelcastanys.cleanlearning.entities.mapper
  *                                 with this program; if not, write to the Free Software Foundation, Inc.,
  *                                 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-object Mapper {
+
+package com.example.domain.interactor
+
+import com.example.domain.callback.MostPopularMoviesCallback
+import com.example.domain.entity.MovieEntity
+import com.example.domain.entity.MovieListEntity
+import com.example.domain.repository.MostPopularMoviesRepository
+import javax.inject.Inject
+
+
+class GetMostPopularMoviesUseCase @Inject constructor(private val mostPopularMoviesRepository: MostPopularMoviesRepository) : MostPopularMoviesUseCase {
+    override fun execute(page: Int, callback: MostPopularMoviesUseCase.Callback) {
+        mostPopularMoviesRepository.getMostPopularMovies(page, object : MostPopularMoviesCallback {
+            override fun onMostPopularMoviesListReceived(moviesList: MovieListEntity) {
+                callback.onReceived(moviesList)
+            }
+
+            override fun onError() {
+                callback.onError()
+            }
+
+        })
+    }
 }

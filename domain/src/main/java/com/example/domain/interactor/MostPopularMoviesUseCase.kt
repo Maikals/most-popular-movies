@@ -1,11 +1,11 @@
 package com.example.domain.interactor
 
-import com.example.domain.entity.MovieEntity
+import com.example.domain.entity.MovieListEntity
 
 interface MostPopularMoviesUseCase {
 
     interface Callback {
-        fun onReceived(movieList: List<MovieEntity>)
+        fun onReceived(movieList: MovieListEntity)
         fun onError()
     }
 
