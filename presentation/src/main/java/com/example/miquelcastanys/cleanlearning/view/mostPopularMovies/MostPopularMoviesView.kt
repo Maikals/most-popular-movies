@@ -15,5 +15,8 @@ interface MostPopularMoviesView {
     fun hideEmptyView()
 
     fun showEmptyView()
+
     fun setLoadingState(state: Boolean)
+
+    var isSearching: Boolean
 }

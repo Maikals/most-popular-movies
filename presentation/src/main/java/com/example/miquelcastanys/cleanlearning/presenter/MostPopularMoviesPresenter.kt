@@ -20,11 +20,16 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
     private val moviesList: ArrayList<BaseListEntity> = ArrayList()
     var isLastPage = false
     var currentPage = 1
+    var searchString = ""
 
     fun start() {
         currentPage = 1
         view.showProgressBar(true)
-        getMostPopularMoviesList(true)
+        if (view.isSearching) {
+            searchMovieByText()
+        } else {
+            getMostPopularMoviesList(true)
+        }
     }
 
     fun getMostPopularMoviesList(refreshList: Boolean = false) {
@@ -44,13 +49,14 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
             override fun onError() =
                 manageEmptyList()
 
+
         })
     }
 
     private fun manageMovieListEntityReceived(refreshList: Boolean, moviesListEntity: MovieListEntity) {
         if (refreshList) moviesList.clear()
         setIsLastPage(currentPage, moviesListEntity.totalPages)
-        addResultToTvShowList(MoviesListPresentationMapper.toPresentationObject(moviesListEntity))
+        addResultToMoviesList(MoviesListPresentationMapper.toPresentationObject(moviesListEntity))
     }
 
     private fun manageList() {
@@ -65,6 +71,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
     private fun manageEmptyList() {
         currentPage = 1
+        moviesList.clear()
         view.showProgressBar(false)
         view.hideRecyclerView()
         view.showEmptyView()
@@ -76,8 +83,8 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         moviesList.add(FooterEntity())
     }
 
-    private fun addResultToTvShowList(tvShowListResult: List<BaseListEntity>) {
-        moviesList.addAll(tvShowListResult)
+    private fun addResultToMoviesList(moviesListResult: List<BaseListEntity>) {
+        moviesList.addAll(moviesListResult)
     }
 
     private fun setIsLastPage(page: Int, totalPages: Int) {
@@ -88,16 +95,21 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         moviesList.removeAll { it is FooterEntity }
     }
 
-    fun searchMovieByText(newText: String?) {
-        searchMovies.execute(newText ?: "", currentPage, object : SearchMoviesUseCase.Callback {
+    fun searchMovieByText(newText: String? = "", refreshList: Boolean = false) {
+        searchString = newText ?: ""
+        if (refreshList) currentPage = 1
+        searchMovies.execute(searchString, currentPage++, object : SearchMoviesUseCase.Callback {
             override fun onReceived(moviesListEntity: MovieListEntity) {
-                manageMovieListEntityReceived(true, moviesListEntity)
-                manageList()
+                manageMovieListEntityReceived(refreshList, moviesListEntity)
+                if (moviesListEntity.moviesList.isNotEmpty()) {
+                    manageList()
+                } else {
+                    manageEmptyList()
+                }
             }
 
-            override fun onError() {
+            override fun onError() =
                 manageEmptyList()
-            }
 
         })
     }

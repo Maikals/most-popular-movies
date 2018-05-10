@@ -39,12 +39,25 @@ class MostPopularMoviesActivity : BaseActivity() {
             }
 
         })
+
         return true
     }
 
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         searchAction = menu.findItem(R.id.action_search)
+        searchAction?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
+                (currentFragment as? MostPopularMoviesFragment)?.searchClosed()
+                (currentFragment as? MostPopularMoviesFragment)?.getMostPopularMovies()
+                return true
+            }
+
+        })
         return super.onPrepareOptionsMenu(menu)
     }
 

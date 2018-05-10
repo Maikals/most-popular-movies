@@ -18,8 +18,8 @@ import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_most_popular_movies.*
 import javax.inject.Inject
 
-
 class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
+    override var isSearching: Boolean = false
 
     @Inject
     lateinit var presenter: MostPopularMoviesPresenter
@@ -43,7 +43,11 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 if (!presenter.isLastPage && !loading) {
                     if (visibleItemCount + pastVisibleItems >= totalItemCount - 5) {
                         loading = true
-                        presenter.getMostPopularMoviesList()
+                        if (isSearching) {
+                            presenter.searchMovieByText(presenter.searchString)
+                        } else {
+                            presenter.getMostPopularMoviesList()
+                        }
                     }
                 }
             } else if (linearLayoutManager.findLastVisibleItemPosition() == mostPopularMoviesRV.adapter.itemCount - 1
@@ -90,7 +94,9 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     private fun setRefreshLayoutBehaviour() =
         swipeRefreshLayout.setOnRefreshListener {
             loading = true
-            (mostPopularMoviesRV.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()
+            if (!isSearching) {
+                (mostPopularMoviesRV.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()
+            }
             presenter.start()
         }
 
@@ -132,6 +138,17 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         mostPopularMoviesRV.removeOnScrollListener(onScrollListener)
 
     fun searchMovie(newText: String?) {
-        presenter.searchMovieByText(newText)
+        isSearching = true
+        presenter.searchMovieByText(newText, refreshList = true)
+    }
+
+
+    fun searchClosed() {
+        isSearching = false
+    }
+
+    fun getMostPopularMovies() {
+        presenter.start()
     }
 }
+
