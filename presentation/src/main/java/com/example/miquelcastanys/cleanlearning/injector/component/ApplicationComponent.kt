@@ -6,7 +6,6 @@ import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModu
 import com.example.miquelcastanys.cleanlearning.injector.module.MostPopularMoviesModule
 import com.example.miquelcastanys.cleanlearning.injector.module.MovieApiModule
 import com.example.miquelcastanys.cleanlearning.view.base.BaseActivity
-import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesFragment
 import dagger.Component
 import javax.inject.Singleton
 
