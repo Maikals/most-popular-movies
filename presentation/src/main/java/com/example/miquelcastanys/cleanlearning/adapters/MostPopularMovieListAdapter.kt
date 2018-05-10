@@ -1,7 +1,9 @@
 package com.example.miquelcastanys.cleanlearning.adapters
 
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.entities.BaseListEntity
 import com.example.miquelcastanys.cleanlearning.entities.MovieEntity
@@ -11,6 +13,8 @@ import com.example.miquelcastanys.cleanlearning.view.MovieViewHolder
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.FooterViewHolder
 
 class MostPopularMovieListAdapter(val movieList: List<BaseListEntity>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private var lastPosition: Int = -1
 
     companion object {
         private const val FOOTER_TYPE = Constants.FOOTER_TYPE
@@ -35,6 +39,15 @@ class MostPopularMovieListAdapter(val movieList: List<BaseListEntity>) : Recycle
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         (holder as? MovieViewHolder)?.bindView(movieList[position] as MovieEntity)
+        setAnimation((holder as? MovieViewHolder)?.view!!, position)
+    }
+
+    fun setAnimation(viewToAnimate: View, position: Int) {
+        if (position > lastPosition) {
+            val animation = AnimationUtils.loadAnimation(viewToAnimate.context, R.anim.slide_in_right)
+            viewToAnimate.startAnimation(animation)
+            lastPosition = position
+        }
     }
 
 }
