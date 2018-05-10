@@ -6,15 +6,23 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.adapters.MostPopularMovieListAdapter
 import com.example.miquelcastanys.cleanlearning.entities.BaseListEntity
 import com.example.miquelcastanys.cleanlearning.entities.enumerations.EmptyViewEnumeration
+import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
+import com.example.miquelcastanys.cleanlearning.injector.module.MostPopularMoviesModule
+import com.example.miquelcastanys.cleanlearning.presenter.MostPopularMoviesPresenter
 import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_most_popular_movies.*
+import javax.inject.Inject
 
 
 class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
+
+    @Inject
+    lateinit var presenter: MostPopularMoviesPresenter
 
     companion object {
         const val TAG = "MostPopularMoviesFragment"
@@ -32,17 +40,17 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 val visibleItemCount = linearLayoutManager.childCount
                 val totalItemCount = linearLayoutManager.itemCount
                 val pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition()
-                /*if (!presenter?.isLastPage!! && !loading) {
+                if (!presenter.isLastPage && !loading) {
                     if (visibleItemCount + pastVisibleItems >= totalItemCount - 5) {
                         loading = true
-                        presenter?.getTvShowsList()
+                        presenter.getMostPopularMoviesList()
                     }
-                }*/
-            }/* else if (linearLayoutManager.findLastVisibleItemPosition() == tvShowsListRV.adapter.itemCount - 1
-                    && !presenter?.isLastPage!!) {
-                presenter?.getTvShowsList()
+                }
+            } else if (linearLayoutManager.findLastVisibleItemPosition() == mostPopularMoviesRV.adapter.itemCount - 1
+                    && !presenter.isLastPage) {
+                presenter.getMostPopularMoviesList()
                 loading = true
-            }*/
+            }
         }
     }
 
@@ -53,6 +61,14 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         setRefreshLayoutBehaviour()
         setRecyclerView()
         setEmptyView()
+        presenter.start()
+    }
+
+    override fun setupFragmentComponent() {
+        MostPopularMoviesApplication
+                .applicationComponent
+                .plus(BaseFragmentModule(context!!), MostPopularMoviesModule(this))
+                .inject(this)
     }
 
     override fun showProgressBar(show: Boolean) {
@@ -73,17 +89,11 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     private fun setRefreshLayoutBehaviour() =
         swipeRefreshLayout.setOnRefreshListener {
-            //call service
+            presenter.start()
         }
-
-
-    override fun stopRefreshLayout() {
-        swipeRefreshLayout.isRefreshing = false
-    }
 
     private fun attachScrollListener() =
         mostPopularMoviesRV.addOnScrollListener(onScrollListener)
-
 
     override fun showRecyclerView() {
         mostPopularMoviesRV.visibility = View.VISIBLE

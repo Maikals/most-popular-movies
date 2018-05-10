@@ -15,6 +15,4 @@ interface MostPopularMoviesView {
     fun hideEmptyView()
 
     fun showEmptyView()
-
-    fun stopRefreshLayout()
 }

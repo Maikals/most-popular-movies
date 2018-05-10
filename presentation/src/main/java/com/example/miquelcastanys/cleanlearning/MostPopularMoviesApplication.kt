@@ -12,12 +12,12 @@ class MostPopularMoviesApplication : Application() {
     companion object {
         lateinit var instance: MostPopularMoviesApplication
         @JvmStatic
-        lateinit var applicationModule: ApplicationComponent
+        lateinit var applicationComponent: ApplicationComponent
     }
 
     override fun onCreate() {
         super.onCreate()
         instance = this
-        applicationModule = DaggerApplicationComponent.builder().applicationModule(ApplicationModule(this)).build()
+        applicationComponent = DaggerApplicationComponent.builder().applicationModule(ApplicationModule(this)).build()
     }
 }

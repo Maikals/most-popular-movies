@@ -54,7 +54,7 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun createFragmentAndSettingTAG()
 
     private fun setupActivityComponent() {
-        MostPopularMoviesApplication.applicationModule.inject(this)
+        MostPopularMoviesApplication.applicationComponent.inject(this)
     }
 
     protected fun setToolbarTitle(title: String) {
