@@ -130,4 +130,8 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     private fun unattachScrollListener() =
         mostPopularMoviesRV.removeOnScrollListener(onScrollListener)
+
+    fun searchMovie(newText: String?) {
+        presenter.searchMovieByText(newText)
+    }
 }

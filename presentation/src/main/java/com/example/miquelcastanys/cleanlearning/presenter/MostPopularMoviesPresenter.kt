@@ -2,7 +2,9 @@ package com.example.miquelcastanys.cleanlearning.presenter
 
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.interactor.GetMostPopularMoviesUseCase
+import com.example.domain.interactor.GetSearchMoviesUseCase
 import com.example.domain.interactor.MostPopularMoviesUseCase
+import com.example.domain.interactor.SearchMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.entities.BaseListEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterEntity
 import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
@@ -11,7 +13,7 @@ import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopul
 import javax.inject.Inject
 
 @PerFragment
-class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCase: GetMostPopularMoviesUseCase) {
+class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCase: GetMostPopularMoviesUseCase, private val searchMovies: GetSearchMoviesUseCase) {
 
     @Inject
     lateinit var view: MostPopularMoviesView
@@ -84,6 +86,20 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
     private fun removeFooter() {
         moviesList.removeAll { it is FooterEntity }
+    }
+
+    fun searchMovieByText(newText: String?) {
+        searchMovies.execute(newText ?: "", currentPage, object : SearchMoviesUseCase.Callback {
+            override fun onReceived(moviesListEntity: MovieListEntity) {
+                manageMovieListEntityReceived(true, moviesListEntity)
+                manageList()
+            }
+
+            override fun onError() {
+                manageEmptyList()
+            }
+
+        })
     }
 
 

@@ -31,7 +31,6 @@
 package com.example.domain.interactor
 
 import com.example.domain.callback.MostPopularMoviesCallback
-import com.example.domain.entity.MovieEntity
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.repository.MostPopularMoviesRepository
 import javax.inject.Inject

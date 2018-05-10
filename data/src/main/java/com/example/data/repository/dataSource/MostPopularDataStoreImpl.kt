@@ -17,7 +17,7 @@ class MostPopularDataStoreImpl @Inject constructor(private val mostPopularMovies
             override fun onResponse(call: Call<MovieListDTO>?, response: Response<MovieListDTO>?) {
                 if (response != null && response.isSuccessful && response.body() != null) {
                     callback.onMostPopularMovies(MovieListMapper.toDomainObject(response.body()!!))
-                }
+                } else callback.onError()
             }
 
             override fun onFailure(call: Call<MovieListDTO>?, t: Throwable?) {
