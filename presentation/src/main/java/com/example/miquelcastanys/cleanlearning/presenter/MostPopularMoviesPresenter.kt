@@ -5,8 +5,8 @@ import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.domain.interactor.GetSearchMoviesUseCase
 import com.example.domain.interactor.MostPopularMoviesUseCase
 import com.example.domain.interactor.SearchMoviesUseCase
-import com.example.miquelcastanys.cleanlearning.entities.BaseListEntity
-import com.example.miquelcastanys.cleanlearning.entities.FooterEntity
+import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
+import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
 import com.example.miquelcastanys.cleanlearning.injector.PerFragment
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesView
@@ -17,7 +17,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
     @Inject
     lateinit var view: MostPopularMoviesView
-    private val moviesList: ArrayList<BaseListEntity> = ArrayList()
+    val moviesList: ArrayList<BaseListViewEntity> = ArrayList()
     var isLastPage = false
     var currentPage = 1
     var searchString = ""
@@ -80,10 +80,10 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
 
     private fun addFooter() {
-        moviesList.add(FooterEntity())
+        moviesList.add(FooterViewViewEntity())
     }
 
-    private fun addResultToMoviesList(moviesListResult: List<BaseListEntity>) {
+    private fun addResultToMoviesList(moviesListResult: List<BaseListViewEntity>) {
         moviesList.addAll(moviesListResult)
     }
 
@@ -92,7 +92,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
     }
 
     private fun removeFooter() {
-        moviesList.removeAll { it is FooterEntity }
+        moviesList.removeAll { it is FooterViewViewEntity }
     }
 
     fun searchMovieByText(newText: String? = "", refreshList: Boolean = false) {

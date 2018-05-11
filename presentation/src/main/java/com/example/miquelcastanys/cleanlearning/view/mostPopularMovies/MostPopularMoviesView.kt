@@ -1,10 +1,10 @@
 package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
 
-import com.example.miquelcastanys.cleanlearning.entities.BaseListEntity
+import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 
 
 interface MostPopularMoviesView {
-    fun setItems(moviesList: List<BaseListEntity>)
+    fun setItems(moviesList: List<BaseListViewEntity>)
 
     fun showProgressBar(show: Boolean)
 

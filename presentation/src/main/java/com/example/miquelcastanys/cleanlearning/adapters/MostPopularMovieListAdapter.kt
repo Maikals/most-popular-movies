@@ -5,14 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import com.example.miquelcastanys.cleanlearning.R
-import com.example.miquelcastanys.cleanlearning.entities.BaseListEntity
-import com.example.miquelcastanys.cleanlearning.entities.MovieEntity
+import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
+import com.example.miquelcastanys.cleanlearning.entities.MovieViewEntity
 import com.example.miquelcastanys.cleanlearning.inflateFromLayout
 import com.example.miquelcastanys.cleanlearning.util.Constants
 import com.example.miquelcastanys.cleanlearning.view.MovieViewHolder
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.FooterViewHolder
 
-class MostPopularMovieListAdapter(val movieList: List<BaseListEntity>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MostPopularMovieListAdapter(val movieList: List<BaseListViewEntity>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var lastPosition: Int = -1
 
@@ -32,14 +32,14 @@ class MostPopularMovieListAdapter(val movieList: List<BaseListEntity>) : Recycle
 
     override fun getItemViewType(position: Int): Int =
             when (movieList[position]) {
-                is MovieEntity -> MOVIE_TYPE
+                is MovieViewEntity -> MOVIE_TYPE
                 else -> FOOTER_TYPE
             }
 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is MovieViewHolder && holder.view != null) {
-            holder.bindView(movieList[position] as MovieEntity)
+            holder.bindView(movieList[position] as MovieViewEntity)
             setAnimation(holder.view, position)
         }
     }

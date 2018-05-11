@@ -1,8 +1,8 @@
 package com.example.miquelcastanys.cleanlearning.entities.mapper
 
 import com.example.domain.entity.MovieListEntity
-import com.example.miquelcastanys.cleanlearning.entities.BaseListEntity
-import com.example.miquelcastanys.cleanlearning.entities.MovieEntity
+import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
+import com.example.miquelcastanys.cleanlearning.entities.MovieViewEntity
 
 /*            _MMMMM`
  *     __MMMMMMMMM`       J        openTrends Solucions i Sistemes, S.L.
@@ -34,7 +34,7 @@ import com.example.miquelcastanys.cleanlearning.entities.MovieEntity
  *                                 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
 object MoviesListPresentationMapper {
-    fun toPresentationObject(movieListEntity: MovieListEntity) : List<BaseListEntity> =
+    fun toPresentationObject(movieListEntity: MovieListEntity) : List<BaseListViewEntity> =
             movieListEntity.moviesList
-                    .map { MovieEntity(it.title, it.voteAverage, it.backdropPath) as BaseListEntity }
+                    .map { MovieViewEntity(it.title, it.voteAverage, it.backdropPath) as BaseListViewEntity }
 }

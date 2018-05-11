@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.adapters.MostPopularMovieListAdapter
-import com.example.miquelcastanys.cleanlearning.entities.BaseListEntity
+import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.enumerations.EmptyViewEnumeration
 import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
 import com.example.miquelcastanys.cleanlearning.injector.module.MostPopularMoviesModule
@@ -124,7 +124,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         unattachScrollListener()
     }
 
-    override fun setItems(moviesList: List<BaseListEntity>) {
+    override fun setItems(moviesList: List<BaseListViewEntity>) {
         if (mostPopularMoviesRV.adapter == null) mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(moviesList)
 
         mostPopularMoviesRV.adapter.notifyDataSetChanged()

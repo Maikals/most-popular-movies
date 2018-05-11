@@ -1,3 +1,3 @@
 package com.example.miquelcastanys.cleanlearning.entities
 
-abstract class BaseListEntity
+abstract class BaseListViewEntity
