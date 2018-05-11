@@ -5,6 +5,7 @@ import com.example.domain.entity.MovieListEntity
 import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.domain.interactor.GetSearchMoviesUseCase
 import com.example.domain.interactor.MostPopularMoviesUseCase
+import com.example.domain.interactor.SearchMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.UnitTest
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesView
 import com.nhaarman.mockito_kotlin.any
@@ -34,9 +35,13 @@ class MoviesPresenterTest : UnitTest() {
         initializeView()
     }
 
+    private fun initializeView() {
+        presenter.view = view
+    }
+
     @Test
     fun getMostPopularMoviesOK() {
-        setupGetComicsCallbackOK()
+        setupGetMostPopularMoviesCallbackOK()
 
         presenter.getMostPopularMoviesList()
 
@@ -48,7 +53,7 @@ class MoviesPresenterTest : UnitTest() {
 
     @Test
     fun getMostPopularMoviesOKEmpty() {
-        setupGetComicsCallbackOKEmpty()
+        setupGetMostPopularMoviesCallbackOKEmpty()
 
         presenter.getMostPopularMoviesList()
 
@@ -59,7 +64,7 @@ class MoviesPresenterTest : UnitTest() {
 
     @Test
     fun getMostPopularMoviesError() {
-        setupGetComicsCallbackError()
+        setupGetMostPopularMoviesCallbackError()
 
         presenter.getMostPopularMoviesList()
 
@@ -68,11 +73,41 @@ class MoviesPresenterTest : UnitTest() {
         verify(presenter.view).hideRecyclerView()
     }
 
-    private fun initializeView() {
-        presenter.view = view
+    @Test
+    fun getSearchMoviesOK() {
+        setupGetSearchMoviesCallbackOK()
+
+        presenter.searchMovieByText()
+
+        verify(presenter.view).showProgressBar(false)
+        verify(presenter.view).hideEmptyView()
+        verify(presenter.view).showRecyclerView()
+        verify(presenter.view).setItems(presenter.moviesList)
     }
 
-    private fun setupGetComicsCallbackError() {
+    @Test
+    fun getSearchMoviesOKEmpty() {
+        setupGetSearchMoviesCallbackOKEmpty()
+
+        presenter.searchMovieByText()
+
+        verify(presenter.view).showEmptyView()
+        verify(presenter.view).showProgressBar(false)
+        verify(presenter.view).hideRecyclerView()
+    }
+
+    @Test
+    fun getSearchMoviesError() {
+        setupGetSearchMoviesCallbackError()
+
+        presenter.searchMovieByText()
+
+        verify(presenter.view).showEmptyView()
+        verify(presenter.view).showProgressBar(false)
+        verify(presenter.view).hideRecyclerView()
+    }
+
+    private fun setupGetMostPopularMoviesCallbackError() {
         doAnswer {
             val callback = it.arguments[1] as MostPopularMoviesUseCase.Callback
             callback.onError()
@@ -80,7 +115,7 @@ class MoviesPresenterTest : UnitTest() {
         }.`when`(mostPopularMoviesUseCase).execute(ArgumentMatchers.anyInt(), any())
     }
 
-    private fun setupGetComicsCallbackOK() {
+    private fun setupGetMostPopularMoviesCallbackOK() {
         doAnswer {
             val callback = it.arguments[1] as MostPopularMoviesUseCase.Callback
             callback.onReceived(createMoviesListEntity())
@@ -88,12 +123,37 @@ class MoviesPresenterTest : UnitTest() {
         }.`when`(mostPopularMoviesUseCase).execute(ArgumentMatchers.anyInt(), any())
     }
 
-    private fun setupGetComicsCallbackOKEmpty() {
+    private fun setupGetMostPopularMoviesCallbackOKEmpty() {
         doAnswer {
             val callback = it.arguments[1] as MostPopularMoviesUseCase.Callback
             callback.onReceived(movieListEntity)
             null
         }.`when`(mostPopularMoviesUseCase).execute(ArgumentMatchers.anyInt(), any())
+    }
+
+    private fun setupGetSearchMoviesCallbackOK() {
+        doAnswer {
+            val callback = it.arguments[2] as SearchMoviesUseCase.Callback
+            callback.onReceived(createMoviesListEntity())
+            null
+        }.`when`(searchMoviesUseCase).execute(ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(), any())
+    }
+
+    private fun setupGetSearchMoviesCallbackOKEmpty() {
+        doAnswer {
+            val callback = it.arguments[2] as SearchMoviesUseCase.Callback
+            callback.onReceived(movieListEntity)
+            null
+        }.`when`(searchMoviesUseCase).execute(ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(), any())
+    }
+
+
+    private fun setupGetSearchMoviesCallbackError() {
+        doAnswer {
+            val callback = it.arguments[2] as SearchMoviesUseCase.Callback
+            callback.onError()
+            null
+        }.`when`(searchMoviesUseCase).execute(ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(), any())
     }
 
     private fun createMoviesListEntity(): MovieListEntity =
