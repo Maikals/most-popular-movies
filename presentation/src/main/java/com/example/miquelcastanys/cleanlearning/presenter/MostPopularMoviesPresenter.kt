@@ -20,7 +20,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
     val moviesList: ArrayList<BaseListViewEntity> = ArrayList()
     var isLastPage = false
     private var currentPage = 1
-    var searchString = ""
+    private var searchString = ""
     var isSearching = false
 
     fun start() {
