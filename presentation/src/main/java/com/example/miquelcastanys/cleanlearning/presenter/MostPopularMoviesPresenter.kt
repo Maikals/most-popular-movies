@@ -19,21 +19,30 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
     lateinit var view: MostPopularMoviesView
     val moviesList: ArrayList<BaseListViewEntity> = ArrayList()
     var isLastPage = false
-    var currentPage = 1
+    private var currentPage = 1
     var searchString = ""
+    var isSearching = false
 
     fun start() {
         currentPage = 1
         view.showProgressBar(true)
-        if (view.isSearching) {
+        if (isSearching) {
             searchMovieByText()
         } else {
             getMostPopularMoviesList(true)
         }
     }
 
+    fun loadMoreElements() {
+        if (isSearching) {
+            searchMovieByText(searchString)
+        } else {
+            getMostPopularMoviesList()
+        }
+    }
+
     fun getMostPopularMoviesList(refreshList: Boolean = false) {
-        mostPopularMoviesUseCase.execute(currentPage++, MoviesListObserver(this, refreshList) as DefaultObserver<Any>)
+        mostPopularMoviesUseCase.execute(currentPage++, MoviesListObserver(this, refreshList))
     }
 
     fun manageMovieListEntityReceived(refreshList: Boolean, moviesListEntity: MovieListEntity) {
@@ -41,8 +50,6 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         setIsLastPage(currentPage, moviesListEntity.totalPages)
         addResultToMoviesList(MoviesListPresentationMapper.toPresentationObject(moviesListEntity))
     }
-
-    fun hideProgressBar(showProgress: Boolean) = view.showProgressBar(showProgress)
 
     fun manageList() {
         removeFooter()
@@ -81,6 +88,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
     }
 
     fun searchMovieByText(newText: String? = "", refreshList: Boolean = false) {
+        isSearching = true
         searchString = newText ?: ""
         if (refreshList) currentPage = 1
         searchMovies.execute(searchString, currentPage++, object : SearchMoviesUseCase.Callback {
@@ -94,14 +102,13 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
             }
 
             override fun onError() =
-                manageEmptyList()
+                    manageEmptyList()
 
         })
     }
 
     class MoviesListObserver(private val presenter: MostPopularMoviesPresenter, private val refreshList: Boolean) : DefaultObserver<MovieListEntity>() {
         override fun onComplete() {
-            presenter.hideProgressBar(false)
         }
 
         override fun onNext(movieListEntity: MovieListEntity) {
@@ -114,7 +121,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         }
 
         override fun onError(e: Throwable) =
-            presenter.manageEmptyList()
+                presenter.manageEmptyList()
 
     }
 

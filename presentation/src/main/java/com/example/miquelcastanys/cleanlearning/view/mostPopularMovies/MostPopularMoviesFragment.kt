@@ -1,11 +1,12 @@
 package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
 
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.support.v7.widget.SearchView
+import android.view.*
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.adapters.MostPopularMovieListAdapter
@@ -20,6 +21,7 @@ import javax.inject.Inject
 
 class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     override var isSearching: Boolean = false
+    private var searchAction: MenuItem? = null
 
     @Inject
     lateinit var presenter: MostPopularMoviesPresenter
@@ -43,16 +45,12 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 if (!presenter.isLastPage && !loading) {
                     if (visibleItemCount + pastVisibleItems >= totalItemCount - 5) {
                         loading = true
-                        if (isSearching) {
-                            presenter.searchMovieByText(presenter.searchString)
-                        } else {
-                            presenter.getMostPopularMoviesList()
-                        }
+                        presenter.loadMoreElements()
                     }
                 }
             } else if (linearLayoutManager.findLastVisibleItemPosition() == mostPopularMoviesRV.adapter.itemCount - 1
                     && !presenter.isLastPage) {
-                presenter.getMostPopularMoviesList()
+                presenter.loadMoreElements()
                 loading = true
             }
         }
@@ -65,7 +63,42 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         setRefreshLayoutBehaviour()
         setRecyclerView()
         setEmptyView()
+        setHasOptionsMenu(true)
         presenter.start()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.search_menu, menu)
+        val searchManager = activity?.getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchView = menu?.findItem(R.id.action_search)?.actionView as SearchView
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(activity?.componentName))
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                searchMovie(newText)
+                return true
+            }
+
+        })
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?) {
+        searchAction = menu?.findItem(R.id.action_search)
+        searchAction?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
+                searchClosed()
+                getMostPopularMovies()
+                return true
+            }
+
+        })
+        super.onPrepareOptionsMenu(menu)
     }
 
     override fun setupFragmentComponent() {
@@ -138,13 +171,12 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         mostPopularMoviesRV.removeOnScrollListener(onScrollListener)
 
     fun searchMovie(newText: String?) {
-        isSearching = true
         presenter.searchMovieByText(newText, refreshList = true)
     }
 
 
     fun searchClosed() {
-        isSearching = false
+        presenter.isSearching = false
     }
 
     fun getMostPopularMovies() {
