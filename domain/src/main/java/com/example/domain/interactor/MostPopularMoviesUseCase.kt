@@ -1,6 +1,8 @@
 package com.example.domain.interactor
 
 import com.example.domain.entity.MovieListEntity
+import com.example.domain.executor.PostExecutionThread
+import io.reactivex.observers.DefaultObserver
 
 interface MostPopularMoviesUseCase {
 
@@ -9,6 +11,6 @@ interface MostPopularMoviesUseCase {
         fun onError()
     }
 
-    fun execute(page: Int, callback: Callback)
-
+    fun execute(page: Int, observer: DefaultObserver<Any>)
+    val postExecutionThread: PostExecutionThread
 }

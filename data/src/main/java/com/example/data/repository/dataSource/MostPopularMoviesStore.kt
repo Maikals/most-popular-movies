@@ -1,13 +1,9 @@
 package com.example.data.repository.dataSource
 
 import com.example.domain.entity.MovieListEntity
+import io.reactivex.Observable
 
 
 interface MostPopularMoviesStore {
-    interface GetMostPopularMoviesListCallback {
-        fun onMostPopularMovies(moviesList: MovieListEntity)
-        fun onError()
-    }
-
-    fun getMostPopularMoviesList(page: Int, callback: GetMostPopularMoviesListCallback)
+    fun getMostPopularMoviesList(page: Int) : Observable<MovieListEntity>
 }
