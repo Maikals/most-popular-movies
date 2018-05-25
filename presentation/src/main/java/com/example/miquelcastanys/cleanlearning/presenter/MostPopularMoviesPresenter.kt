@@ -17,13 +17,6 @@ import javax.inject.Inject
 @PerFragment
 class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCase: GetMostPopularMoviesUseCase,
                                                      private val searchMovies: GetSearchMoviesUseCase) : Presenter {
-    override fun resume() {}
-
-    override fun pause() {}
-
-    override fun destroy() {
-        mostPopularMoviesUseCase
-    }
 
     @Inject
     lateinit var view: MostPopularMoviesView
@@ -41,6 +34,14 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         } else {
             getMostPopularMoviesList(true)
         }
+    }
+
+    override fun resume() {}
+
+    override fun pause() {}
+
+    override fun destroy() {
+        mostPopularMoviesUseCase.dispose()
     }
 
     fun loadMoreElements() {

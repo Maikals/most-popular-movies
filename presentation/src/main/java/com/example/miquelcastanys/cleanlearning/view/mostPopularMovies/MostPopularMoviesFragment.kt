@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.fragment_most_popular_movies.*
 import javax.inject.Inject
 
 class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
-    override var isSearching: Boolean = false
     private var searchAction: MenuItem? = null
 
     @Inject
@@ -66,6 +65,13 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         setHasOptionsMenu(true)
         presenter.start()
     }
+
+    override fun onResume() {
+        super.onResume()
+        presenter.resume()
+    }
+
+
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater?.inflate(R.menu.search_menu, menu)
@@ -127,11 +133,15 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     private fun setRefreshLayoutBehaviour() =
         swipeRefreshLayout.setOnRefreshListener {
             loading = true
-            if (!isSearching) {
-                (mostPopularMoviesRV.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()
+            if (!presenter.isSearching) {
+                restartListAnimation()
             }
             presenter.start()
         }
+
+    override fun restartListAnimation() {
+        (mostPopularMoviesRV.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()
+    }
 
     private fun attachScrollListener() =
         mostPopularMoviesRV.addOnScrollListener(onScrollListener)
@@ -152,8 +162,14 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         emptyView.visibility = View.VISIBLE
     }
 
+    override fun onPause() {
+        super.onPause()
+        presenter.pause()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        presenter.destroy()
         unattachScrollListener()
     }
 

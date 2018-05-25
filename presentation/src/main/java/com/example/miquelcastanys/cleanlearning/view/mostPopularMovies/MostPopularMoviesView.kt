@@ -18,5 +18,6 @@ interface MostPopularMoviesView {
 
     fun setLoadingState(state: Boolean)
 
-    var isSearching: Boolean
+    fun restartListAnimation()
+
 }
