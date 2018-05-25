@@ -8,7 +8,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
 
-interface MostPopularMoviesUseCase<T> {
+interface UseCase<T, Params> {
 
     val postExecutionThread: PostExecutionThread
     val disposables: CompositeDisposable
@@ -19,8 +19,8 @@ interface MostPopularMoviesUseCase<T> {
         fun onError()
     }
 
-    fun execute(page: Int, observer: DisposableObserver<T>) {
-        addDisposable(buildUseCaseObservable(page)
+    fun execute(params: Params, observer: DisposableObserver<T>) {
+        addDisposable(buildUseCaseObservable(params)
                 .subscribeOn(Schedulers.io())
                 .observeOn(postExecutionThread.getScheduler())
                 .subscribe(
@@ -32,7 +32,7 @@ interface MostPopularMoviesUseCase<T> {
                         }))
     }
 
-    fun buildUseCaseObservable(page: Int): Single<T>
+    fun buildUseCaseObservable(params: Params): Single<T>
 
     fun addDisposable(disposable: Disposable) = disposables.add(disposable)
 

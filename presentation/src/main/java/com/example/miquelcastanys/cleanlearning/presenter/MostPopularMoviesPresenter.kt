@@ -1,5 +1,6 @@
 package com.example.miquelcastanys.cleanlearning.presenter
 
+import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.domain.interactor.GetSearchMoviesUseCase
@@ -51,7 +52,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
     }
 
     fun getMostPopularMoviesList(refreshList: Boolean = false) {
-        mostPopularMoviesUseCase.execute(currentPage++, MoviesListObserver(this, refreshList))
+        mostPopularMoviesUseCase.execute(MostPopularMoviesParams(currentPage++), MoviesListObserver(this, refreshList))
     }
 
     fun manageMovieListEntityReceived(refreshList: Boolean, moviesListEntity: MovieListEntity) {

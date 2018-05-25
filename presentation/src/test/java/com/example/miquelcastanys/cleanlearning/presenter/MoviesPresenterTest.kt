@@ -1,11 +1,12 @@
 package com.example.miquelcastanys.cleanlearning.presenter
 
+import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieEntity
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.domain.interactor.GetSearchMoviesUseCase
-import com.example.domain.interactor.MostPopularMoviesUseCase
 import com.example.domain.interactor.SearchMoviesUseCase
+import com.example.domain.interactor.UseCase
 import com.example.miquelcastanys.cleanlearning.UnitTest
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesView
 import com.nhaarman.mockito_kotlin.any
@@ -27,6 +28,8 @@ class MoviesPresenterTest : UnitTest() {
     private lateinit var view: MostPopularMoviesView
     @Mock
     private lateinit var movieListEntity: MovieListEntity
+    @Mock
+    private lateinit var params: MostPopularMoviesParams
 
 
     @Before
@@ -109,26 +112,26 @@ class MoviesPresenterTest : UnitTest() {
 
     private fun setupGetMostPopularMoviesCallbackError() {
         doAnswer {
-            val callback = it.arguments[1] as MostPopularMoviesUseCase.Callback
+            val callback = it.arguments[1] as UseCase.Callback
             callback.onError()
             null
-        }.`when`(mostPopularMoviesUseCase).execute(ArgumentMatchers.anyInt(), any())
+        }.`when`(mostPopularMoviesUseCase).execute(params, any())
     }
 
     private fun setupGetMostPopularMoviesCallbackOK() {
         doAnswer {
-            val callback = it.arguments[1] as MostPopularMoviesUseCase.Callback
+            val callback = it.arguments[1] as UseCase.Callback
             callback.onReceived(createMoviesListEntity())
             null
-        }.`when`(mostPopularMoviesUseCase).execute(ArgumentMatchers.anyInt(), any())
+        }.`when`(mostPopularMoviesUseCase).execute(params, any())
     }
 
     private fun setupGetMostPopularMoviesCallbackOKEmpty() {
         doAnswer {
-            val callback = it.arguments[1] as MostPopularMoviesUseCase.Callback
+            val callback = it.arguments[1] as UseCase.Callback
             callback.onReceived(movieListEntity)
             null
-        }.`when`(mostPopularMoviesUseCase).execute(ArgumentMatchers.anyInt(), any())
+        }.`when`(mostPopularMoviesUseCase).execute(params, any())
     }
 
     private fun setupGetSearchMoviesCallbackOK() {
