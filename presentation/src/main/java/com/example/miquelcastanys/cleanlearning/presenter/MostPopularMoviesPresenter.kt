@@ -9,11 +9,20 @@ import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
 import com.example.miquelcastanys.cleanlearning.injector.PerFragment
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesView
-import io.reactivex.observers.DefaultObserver
+import io.reactivex.observers.DisposableObserver
+import java.util.*
 import javax.inject.Inject
 
 @PerFragment
-class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCase: GetMostPopularMoviesUseCase, private val searchMovies: GetSearchMoviesUseCase) {
+class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCase: GetMostPopularMoviesUseCase,
+                                                     private val searchMovies: GetSearchMoviesUseCase) : Presenter {
+    override fun resume() {}
+
+    override fun pause() {}
+
+    override fun destroy() {
+        mostPopularMoviesUseCase
+    }
 
     @Inject
     lateinit var view: MostPopularMoviesView
@@ -107,7 +116,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         })
     }
 
-    class MoviesListObserver(private val presenter: MostPopularMoviesPresenter, private val refreshList: Boolean) : DefaultObserver<MovieListEntity>() {
+    class MoviesListObserver(private val presenter: MostPopularMoviesPresenter, private val refreshList: Boolean) : DisposableObserver<MovieListEntity>() {
         override fun onComplete() {
         }
 
