@@ -2,9 +2,9 @@ package com.example.miquelcastanys.cleanlearning.presenter
 
 import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
+import com.example.domain.entity.SearchMoviesParams
 import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.domain.interactor.GetSearchMoviesUseCase
-import com.example.domain.interactor.SearchMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
@@ -99,22 +99,10 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
     fun searchMovieByText(newText: String? = "", refreshList: Boolean = false) {
         isSearching = true
+        if (newText != searchString) searchMovies.dispose()
         searchString = newText ?: ""
         if (refreshList) currentPage = 1
-        searchMovies.execute(searchString, currentPage++, object : SearchMoviesUseCase.Callback {
-            override fun onReceived(moviesListEntity: MovieListEntity) {
-                manageMovieListEntityReceived(refreshList, moviesListEntity)
-                if (moviesListEntity.moviesList.isNotEmpty()) {
-                    manageList()
-                } else {
-                    manageEmptyList()
-                }
-            }
-
-            override fun onError() =
-                    manageEmptyList()
-
-        })
+        searchMovies.execute(SearchMoviesParams(currentPage++, searchString), MoviesListObserver(this, refreshList))
     }
 
     class MoviesListObserver(private val presenter: MostPopularMoviesPresenter, private val refreshList: Boolean) : DisposableObserver<MovieListEntity>() {

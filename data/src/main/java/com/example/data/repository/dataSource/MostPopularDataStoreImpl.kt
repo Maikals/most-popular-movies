@@ -8,9 +8,9 @@ import javax.inject.Inject
 
 
 class MostPopularDataStoreImpl @Inject constructor(private val mostPopularMoviesService: MostPopularMoviesService) : MostPopularMoviesStore {
-    override fun getMostPopularMoviesList(page: Int): Single<MovieListEntity> {
-        return mostPopularMoviesService
-                .getMostPopularMoviesList(page)
-                .map { MovieListMapper.toDomainObject(it) }
-    }
+    override fun getMostPopularMoviesList(page: Int): Single<MovieListEntity> =
+            mostPopularMoviesService
+                    .getMostPopularMoviesList(page)
+                    .map { MovieListMapper.toDomainObject(it) }
+
 }

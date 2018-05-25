@@ -21,7 +21,7 @@ class MovieViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         GlideApp
                 .with(view)
                 .load("${Constants.BASE_IMAGE_URL}$imageUrl")
-                //.placeholder(R.drawable.ic_placeholder_white)
+                .placeholder(R.drawable.ic_empty_view_white)
                 .centerCrop()
                 .into(view.movieImage)
     }

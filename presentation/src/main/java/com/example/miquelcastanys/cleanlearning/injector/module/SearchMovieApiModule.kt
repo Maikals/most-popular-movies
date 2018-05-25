@@ -10,8 +10,10 @@ import com.example.data.repository.dataSource.MostPopularDataStoreImpl
 import com.example.data.repository.dataSource.MostPopularMoviesStore
 import com.example.data.repository.dataSource.SearchMoviesDataStore
 import com.example.data.repository.dataSource.SearchMoviesDataStoreImpl
+import com.example.domain.executor.PostExecutionThread
 import com.example.domain.repository.MostPopularMoviesRepository
 import com.example.domain.repository.SearchMoviesRepository
+import com.example.miquelcastanys.cleanlearning.UIThread
 import dagger.Module
 import dagger.Provides
 import java.util.concurrent.TimeUnit
@@ -46,6 +48,8 @@ class SearchMovieApiModule {
                 .writeTimeout(ApiConstants.TIMEOUT_WRITE_VALUE, TimeUnit.SECONDS)
         val builder = Retrofit.Builder()
                 .baseUrl(ApiConstants.BASE_URL)
+                .addCallAdapterFactory(
+                        RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
         return builder.client(httpClient.build()).build().create(SearchMoviesService::class.java)
     }

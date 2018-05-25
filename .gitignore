@@ -37,3 +37,5 @@ local.properties
 ehthumbs.db
 Thumbs.db
 /build/tmp/jar/MANIFEST.MF
+/build/
+/.idea/
