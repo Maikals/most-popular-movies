@@ -1,9 +1,7 @@
 package com.example.miquelcastanys.cleanlearning.presenter
 
-import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieEntity
 import com.example.domain.entity.MovieListEntity
-import com.example.domain.entity.SearchMoviesParams
 import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.domain.interactor.GetSearchMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.UnitTest
@@ -28,12 +26,6 @@ class MoviesPresenterTest : UnitTest() {
     private lateinit var view: MostPopularMoviesView
     @Mock
     private lateinit var movieListEntity: MovieListEntity
-    @Mock
-    private lateinit var params: MostPopularMoviesParams
-
-    @Mock
-    private lateinit var searchParams: SearchMoviesParams
-
 
     @Before
     fun setUp() {
@@ -116,6 +108,7 @@ class MoviesPresenterTest : UnitTest() {
         verify(presenter.view).hideRecyclerView()
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetMostPopularMoviesCallbackError() {
         doAnswer {
             val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
@@ -124,6 +117,7 @@ class MoviesPresenterTest : UnitTest() {
         }.`when`(mostPopularMoviesUseCase).execute(any(), any())
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetMostPopularMoviesCallbackOK() {
         doAnswer {
             val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
@@ -132,6 +126,7 @@ class MoviesPresenterTest : UnitTest() {
         }.`when`(mostPopularMoviesUseCase).execute(any(), any())
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetMostPopularMoviesCallbackOKEmpty() {
         doAnswer {
             val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
@@ -140,6 +135,7 @@ class MoviesPresenterTest : UnitTest() {
         }.`when`(mostPopularMoviesUseCase).execute(any(), any())
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetSearchMoviesCallbackOK() {
         doAnswer {
             val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
@@ -148,6 +144,7 @@ class MoviesPresenterTest : UnitTest() {
         }.`when`(searchMoviesUseCase).execute(any(), any())
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetSearchMoviesCallbackOKEmpty() {
         doAnswer {
             val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
@@ -157,6 +154,7 @@ class MoviesPresenterTest : UnitTest() {
     }
 
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetSearchMoviesCallbackError() {
         doAnswer {
             val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
