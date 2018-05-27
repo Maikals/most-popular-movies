@@ -1,14 +1,26 @@
 package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.SearchManager
 import android.content.Context
+import android.content.res.Resources
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
+import android.support.v7.widget.Toolbar
 import android.view.*
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.view.animation.AnimationSet
+import android.view.animation.TranslateAnimation
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
+import com.example.miquelcastanys.cleanlearning.interfaces.MostPopularMoviesActivityFragmentInterface
 import com.example.miquelcastanys.cleanlearning.adapters.MostPopularMovieListAdapter
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.enumerations.EmptyViewEnumeration
@@ -19,15 +31,18 @@ import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_most_popular_movies.*
 import javax.inject.Inject
 
+
 class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     private var searchAction: MenuItem? = null
 
     @Inject
     lateinit var presenter: MostPopularMoviesPresenter
 
+    var mostPopularMoviesActivityFragmentInterface: MostPopularMoviesActivityFragmentInterface? = null
+
     companion object {
         const val TAG = "MostPopularMoviesFragment"
-        fun newInstance() : MostPopularMoviesFragment = MostPopularMoviesFragment()
+        fun newInstance(): MostPopularMoviesFragment = MostPopularMoviesFragment()
     }
 
     private val linearLayoutManager: LinearLayoutManager = LinearLayoutManager(context,
@@ -71,7 +86,10 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         presenter.resume()
     }
 
-
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        mostPopularMoviesActivityFragmentInterface = context as? MostPopularMoviesActivityFragmentInterface
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater?.inflate(R.menu.search_menu, menu)
@@ -94,10 +112,12 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         searchAction = menu?.findItem(R.id.action_search)
         searchAction?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
+                animateSearchToolbar(1, true, true)
                 return true
             }
 
             override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
+                animateSearchToolbar(1, false, false)
                 searchClosed()
                 getMostPopularMovies()
                 return true
@@ -131,20 +151,20 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     }
 
     private fun setRefreshLayoutBehaviour() =
-        swipeRefreshLayout.setOnRefreshListener {
-            loading = true
-            if (!presenter.isSearching) {
-                restartListAnimation()
+            swipeRefreshLayout.setOnRefreshListener {
+                loading = true
+                if (!presenter.isSearching) {
+                    restartListAnimation()
+                }
+                presenter.start()
             }
-            presenter.start()
-        }
 
     override fun restartListAnimation() {
         (mostPopularMoviesRV.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()
     }
 
     private fun attachScrollListener() =
-        mostPopularMoviesRV.addOnScrollListener(onScrollListener)
+            mostPopularMoviesRV.addOnScrollListener(onScrollListener)
 
     override fun showRecyclerView() {
         mostPopularMoviesRV.visibility = View.VISIBLE
@@ -184,12 +204,105 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     }
 
     private fun unattachScrollListener() =
-        mostPopularMoviesRV.removeOnScrollListener(onScrollListener)
+            mostPopularMoviesRV.removeOnScrollListener(onScrollListener)
 
     fun searchMovie(newText: String?) {
         presenter.searchMovieByText(newText, refreshList = true)
     }
 
+    fun animateSearchToolbar(numberOfMenuIcon: Int, containsOverflow: Boolean, show: Boolean) {
+
+        val toolbar = mostPopularMoviesActivityFragmentInterface?.getToolbar()
+        toolbar?.let {
+            toolbar.setBackgroundColor(ContextCompat.getColor(context!!, android.R.color.white))
+
+            if (show) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    val createCircularReveal = createCircularAnimationReveal(toolbar, containsOverflow, numberOfMenuIcon)
+                    createCircularReveal.duration = 250
+                    createCircularReveal.start()
+                } else {
+                    searchRevealAnimationPreLollipop(toolbar)
+                }
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    val createCircularReveal = createCircularAnimationReveal(toolbar, containsOverflow, numberOfMenuIcon)
+                    createCircularReveal.addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            super.onAnimationEnd(animation)
+                            toolbar.setBackgroundColor(getThemeColor(context!!, R.attr.colorPrimary))
+                        }
+                    })
+                    createCircularReveal.start()
+                } else {
+                    searchCloseAnimationPreLollipop(toolbar)
+                }
+            }
+        }
+    }
+
+    private fun searchRevealAnimationPreLollipop(toolbar: Toolbar) {
+        val translateAnimation = TranslateAnimation(0.0f,
+                0.0f,
+                -toolbar.height.toFloat(),
+                0.0f)
+        translateAnimation.duration = 220
+        toolbar.clearAnimation()
+        toolbar.startAnimation(translateAnimation)
+    }
+
+    private fun searchCloseAnimationPreLollipop(toolbar: Toolbar) {
+        val alphaAnimation = AlphaAnimation(1.0f, 0.0f)
+        val translateAnimation = TranslateAnimation(0.0f,
+                0.0f,
+                0.0f,
+                -toolbar.height.toFloat())
+        val animationSet = AnimationSet(true)
+        animationSet.addAnimation(alphaAnimation)
+        animationSet.addAnimation(translateAnimation)
+        animationSet.duration = 220
+        animationSet.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animation) {
+                toolbar.setBackgroundColor(getThemeColor(context!!, R.attr.colorPrimary))
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {
+
+            }
+        })
+        toolbar.startAnimation(animationSet)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun createCircularAnimationReveal(toolbar: Toolbar, containsOverflow: Boolean, numberOfMenuIcon: Int): Animator {
+        val width = toolbar.width -
+                (if (containsOverflow) resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) else 0) -
+                resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) * numberOfMenuIcon / 2
+        val createCircularReveal = ViewAnimationUtils.createCircularReveal(toolbar,
+                if (isRtl(resources)) toolbar.width - width else width,
+                toolbar.height / 2,
+                width.toFloat(),
+                0.0f)
+        createCircularReveal.duration = 250
+        return createCircularReveal
+    }
+
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private fun isRtl(resources: Resources): Boolean {
+        return resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
+    }
+
+    private fun getThemeColor(context: Context, id: Int): Int {
+        val theme = context.theme
+        val a = theme.obtainStyledAttributes(intArrayOf(id))
+        val result = a.getColor(0, 0)
+        a.recycle()
+        return result
+    }
 
     fun searchClosed() {
         presenter.isSearching = false
