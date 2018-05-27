@@ -20,12 +20,12 @@ import android.view.animation.AnimationSet
 import android.view.animation.TranslateAnimation
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
-import com.example.miquelcastanys.cleanlearning.interfaces.MostPopularMoviesActivityFragmentInterface
 import com.example.miquelcastanys.cleanlearning.adapters.MostPopularMovieListAdapter
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.enumerations.EmptyViewEnumeration
 import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
 import com.example.miquelcastanys.cleanlearning.injector.module.MostPopularMoviesModule
+import com.example.miquelcastanys.cleanlearning.interfaces.MostPopularMoviesActivityFragmentInterface
 import com.example.miquelcastanys.cleanlearning.presenter.MostPopularMoviesPresenter
 import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_most_popular_movies.*
@@ -218,7 +218,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
             if (show) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    val createCircularReveal = createCircularAnimationReveal(toolbar, containsOverflow, numberOfMenuIcon)
+                    val createCircularReveal = createRevealAnimationReveal(toolbar, containsOverflow, numberOfMenuIcon)
                     createCircularReveal.duration = 250
                     createCircularReveal.start()
                 } else {
@@ -226,7 +226,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 }
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    val createCircularReveal = createCircularAnimationReveal(toolbar, containsOverflow, numberOfMenuIcon)
+                    val createCircularReveal = createCircularAnimationClose(toolbar, containsOverflow, numberOfMenuIcon)
                     createCircularReveal.addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
                             super.onAnimationEnd(animation)
@@ -239,6 +239,21 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 }
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun createRevealAnimationReveal(toolbar: Toolbar, containsOverflow: Boolean, numberOfMenuIcon: Int): Animator {
+        val width = toolbar.width -
+                (if (containsOverflow) resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material)
+                else 0) -
+                resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) *
+                numberOfMenuIcon / 2
+        return ViewAnimationUtils.createCircularReveal(toolbar,
+                if (isRtl(resources)) toolbar.width - width
+                else width,
+                toolbar.height / 2,
+                0.0f,
+                width.toFloat())
     }
 
     private fun searchRevealAnimationPreLollipop(toolbar: Toolbar) {
@@ -262,23 +277,18 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         animationSet.addAnimation(translateAnimation)
         animationSet.duration = 220
         animationSet.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {
+            override fun onAnimationStart(animation: Animation) {}
 
-            }
+            override fun onAnimationEnd(animation: Animation) =
+                    toolbar.setBackgroundColor(getThemeColor(context!!, R.attr.colorPrimary))
 
-            override fun onAnimationEnd(animation: Animation) {
-                toolbar.setBackgroundColor(getThemeColor(context!!, R.attr.colorPrimary))
-            }
-
-            override fun onAnimationRepeat(animation: Animation) {
-
-            }
+            override fun onAnimationRepeat(animation: Animation) {}
         })
         toolbar.startAnimation(animationSet)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun createCircularAnimationReveal(toolbar: Toolbar, containsOverflow: Boolean, numberOfMenuIcon: Int): Animator {
+    private fun createCircularAnimationClose(toolbar: Toolbar, containsOverflow: Boolean, numberOfMenuIcon: Int): Animator {
         val width = toolbar.width -
                 (if (containsOverflow) resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) else 0) -
                 resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) * numberOfMenuIcon / 2
