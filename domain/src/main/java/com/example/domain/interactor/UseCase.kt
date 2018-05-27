@@ -22,6 +22,8 @@ interface UseCase<T, Params> {
     fun execute(params: Params, observer: DisposableObserver<T>) {
         addDisposable(buildUseCaseObservable(params)
                 .subscribeOn(Schedulers.io())
+                .doOnDispose { observer.dispose() }
+                .retry(3)
                 .observeOn(postExecutionThread.getScheduler())
                 .subscribe(
                         {
