@@ -33,10 +33,10 @@ import javax.inject.Inject
 
 
 class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
-    private var searchAction: MenuItem? = null
-
     @Inject
     lateinit var presenter: MostPopularMoviesPresenter
+    private var searchAction: MenuItem? = null
+    var isSearchExpanded: Boolean = false
 
     var mostPopularMoviesActivityFragmentInterface: MostPopularMoviesActivityFragmentInterface? = null
 
@@ -100,7 +100,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                searchMovie(newText)
+                if (isSearchExpanded) searchMovie(newText)
                 return true
             }
 
@@ -112,11 +112,13 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         searchAction = menu?.findItem(R.id.action_search)
         searchAction?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
+                isSearchExpanded = true
                 animateSearchToolbar(1, true, true)
                 return true
             }
 
             override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
+                isSearchExpanded = false
                 animateSearchToolbar(1, false, false)
                 searchClosed()
                 getMostPopularMovies()
@@ -316,6 +318,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     fun searchClosed() {
         presenter.isSearching = false
+        presenter.cancelSearch()
     }
 
     fun getMostPopularMovies() {

@@ -14,11 +14,6 @@ interface UseCase<T, Params> {
     val disposables: CompositeDisposable
         get() = CompositeDisposable()
 
-    interface Callback {
-        fun onReceived(moviesListEntity: MovieListEntity)
-        fun onError()
-    }
-
     fun execute(params: Params, observer: DisposableObserver<T>) {
         addDisposable(buildUseCaseObservable(params)
                 .subscribeOn(Schedulers.io())

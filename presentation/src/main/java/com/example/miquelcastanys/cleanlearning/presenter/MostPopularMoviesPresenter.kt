@@ -106,6 +106,10 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         searchMovies.execute(SearchMoviesParams(currentPage++, searchString), MoviesListObserver(this, refreshList))
     }
 
+    fun cancelSearch() {
+        searchMovies.dispose()
+    }
+
     class MoviesListObserver(private val presenter: MostPopularMoviesPresenter, private val refreshList: Boolean) : DisposableObserver<MovieListEntity>() {
         override fun onComplete() {
         }
