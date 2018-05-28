@@ -1,6 +1,5 @@
 package com.example.domain.interactor
 
-import com.example.domain.entity.MovieListEntity
 import com.example.domain.executor.PostExecutionThread
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
