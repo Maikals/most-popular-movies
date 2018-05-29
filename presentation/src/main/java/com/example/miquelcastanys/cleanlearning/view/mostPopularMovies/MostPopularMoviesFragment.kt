@@ -38,7 +38,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     private var searchAction: MenuItem? = null
     var isSearchExpanded: Boolean = false
 
-    var mostPopularMoviesActivityFragmentInterface: MostPopularMoviesActivityFragmentInterface? = null
+    private var mostPopularMoviesActivityFragmentInterface: MostPopularMoviesActivityFragmentInterface? = null
 
     companion object {
         const val TAG = "MostPopularMoviesFragment"
@@ -75,6 +75,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setRefreshLayoutBehaviour()
+
         setRecyclerView()
         setEmptyView()
         setHasOptionsMenu(true)
@@ -137,10 +138,12 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     }
 
     override fun showProgressBar(show: Boolean) {
-        if (swipeRefreshLayout.isRefreshing) {
-            if (!show)
-                swipeRefreshLayout.isRefreshing = false
-        } else progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        swipeRefreshLayout?.let {
+            if (swipeRefreshLayout.isRefreshing) {
+                if (!show)
+                    swipeRefreshLayout.isRefreshing = false
+            } else progressBar?.visibility = if (show) View.VISIBLE else View.GONE
+        }
     }
 
     private fun setEmptyView() {
@@ -162,26 +165,26 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
             }
 
     override fun restartListAnimation() {
-        (mostPopularMoviesRV.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()
+        (mostPopularMoviesRV?.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()
     }
 
     private fun attachScrollListener() =
-            mostPopularMoviesRV.addOnScrollListener(onScrollListener)
+            mostPopularMoviesRV?.addOnScrollListener(onScrollListener)
 
     override fun showRecyclerView() {
-        mostPopularMoviesRV.visibility = View.VISIBLE
+        mostPopularMoviesRV?.visibility = View.VISIBLE
     }
 
     override fun hideRecyclerView() {
-        mostPopularMoviesRV.visibility = View.GONE
+        mostPopularMoviesRV?.visibility = View.GONE
     }
 
     override fun hideEmptyView() {
-        emptyView.visibility = View.GONE
+        emptyView?.visibility = View.GONE
     }
 
     override fun showEmptyView() {
-        emptyView.visibility = View.VISIBLE
+        emptyView?.visibility = View.VISIBLE
     }
 
     override fun onPause() {
@@ -196,9 +199,11 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     }
 
     override fun setItems(moviesList: List<BaseListViewEntity>) {
-        if (mostPopularMoviesRV.adapter == null) mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(moviesList)
+        mostPopularMoviesRV?.let {
+            if (mostPopularMoviesRV.adapter == null) mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(moviesList)
 
-        mostPopularMoviesRV.adapter.notifyDataSetChanged()
+            mostPopularMoviesRV.adapter.notifyDataSetChanged()
+        }
     }
 
     override fun setLoadingState(state: Boolean) {
@@ -206,7 +211,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     }
 
     private fun unattachScrollListener() =
-            mostPopularMoviesRV.removeOnScrollListener(onScrollListener)
+            mostPopularMoviesRV?.removeOnScrollListener(onScrollListener)
 
     fun searchMovie(newText: String?) {
         presenter.searchMovieByText(newText, refreshList = true)
