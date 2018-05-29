@@ -1,0 +1,6 @@
+package com.example.miquelcastanys.cleanlearning.interfaces
+
+import com.example.miquelcastanys.cleanlearning.view.base.BaseActivityFragmentInterface
+
+
+interface MostPopularMoviesActivityFragmentInterface : BaseActivityFragmentInterface
