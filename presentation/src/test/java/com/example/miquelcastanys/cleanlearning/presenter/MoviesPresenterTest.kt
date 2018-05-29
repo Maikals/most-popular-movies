@@ -4,17 +4,16 @@ import com.example.domain.entity.MovieEntity
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.domain.interactor.GetSearchMoviesUseCase
-import com.example.domain.interactor.MostPopularMoviesUseCase
-import com.example.domain.interactor.SearchMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.UnitTest
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesView
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doAnswer
 import com.nhaarman.mockito_kotlin.verify
+import io.reactivex.observers.DisposableObserver
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
 import org.mockito.Mock
+import org.mockito.Mockito
 
 class MoviesPresenterTest : UnitTest() {
 
@@ -27,7 +26,6 @@ class MoviesPresenterTest : UnitTest() {
     private lateinit var view: MostPopularMoviesView
     @Mock
     private lateinit var movieListEntity: MovieListEntity
-
 
     @Before
     fun setUp() {
@@ -100,6 +98,9 @@ class MoviesPresenterTest : UnitTest() {
     fun getSearchMoviesError() {
         setupGetSearchMoviesCallbackError()
 
+        presenter.start()
+        Mockito.verify(presenter.view).showProgressBar(true)
+
         presenter.searchMovieByText()
 
         verify(presenter.view).showEmptyView()
@@ -107,53 +108,59 @@ class MoviesPresenterTest : UnitTest() {
         verify(presenter.view).hideRecyclerView()
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetMostPopularMoviesCallbackError() {
         doAnswer {
-            val callback = it.arguments[1] as MostPopularMoviesUseCase.Callback
-            callback.onError()
+            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
+            observer.onError(Throwable())
             null
-        }.`when`(mostPopularMoviesUseCase).execute(ArgumentMatchers.anyInt(), any())
+        }.`when`(mostPopularMoviesUseCase).execute(any(), any())
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetMostPopularMoviesCallbackOK() {
         doAnswer {
-            val callback = it.arguments[1] as MostPopularMoviesUseCase.Callback
-            callback.onReceived(createMoviesListEntity())
+            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
+            observer.onNext(createMoviesListEntity())
             null
-        }.`when`(mostPopularMoviesUseCase).execute(ArgumentMatchers.anyInt(), any())
+        }.`when`(mostPopularMoviesUseCase).execute(any(), any())
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetMostPopularMoviesCallbackOKEmpty() {
         doAnswer {
-            val callback = it.arguments[1] as MostPopularMoviesUseCase.Callback
-            callback.onReceived(movieListEntity)
+            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
+            observer.onNext(movieListEntity)
             null
-        }.`when`(mostPopularMoviesUseCase).execute(ArgumentMatchers.anyInt(), any())
+        }.`when`(mostPopularMoviesUseCase).execute(any(), any())
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetSearchMoviesCallbackOK() {
         doAnswer {
-            val callback = it.arguments[2] as SearchMoviesUseCase.Callback
-            callback.onReceived(createMoviesListEntity())
+            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
+            observer.onNext(createMoviesListEntity())
             null
-        }.`when`(searchMoviesUseCase).execute(ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(), any())
+        }.`when`(searchMoviesUseCase).execute(any(), any())
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetSearchMoviesCallbackOKEmpty() {
         doAnswer {
-            val callback = it.arguments[2] as SearchMoviesUseCase.Callback
-            callback.onReceived(movieListEntity)
+            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
+            observer.onNext(movieListEntity)
             null
-        }.`when`(searchMoviesUseCase).execute(ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(), any())
+        }.`when`(searchMoviesUseCase).execute(any(), any())
     }
 
 
+    @Suppress("UNCHECKED_CAST")
     private fun setupGetSearchMoviesCallbackError() {
         doAnswer {
-            val callback = it.arguments[2] as SearchMoviesUseCase.Callback
-            callback.onError()
+            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
+            observer.onError(Throwable())
             null
-        }.`when`(searchMoviesUseCase).execute(ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(), any())
+        }.`when`(searchMoviesUseCase).execute(any(), any())
     }
 
     private fun createMoviesListEntity(): MovieListEntity =

@@ -34,7 +34,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
 
     private fun initializeFragmentAndTAG(savedInstanceState: Bundle?) {
-        if (savedInstanceState == null || !savedInstanceState.containsKey(currentTag)) {
+        if (savedInstanceState == null || !savedInstanceState.containsKey(CURRENT_FRAGMENT_TAG)) {
             createFragmentAndSettingTAG()
         } else {
             currentTag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)
