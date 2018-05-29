@@ -11,7 +11,6 @@ interface UseCase<T, Params> {
 
     val postExecutionThread: PostExecutionThread
     val disposables: CompositeDisposable
-        get() = CompositeDisposable()
 
     fun execute(params: Params, observer: DisposableObserver<T>) {
         addDisposable(buildUseCaseObservable(params)
