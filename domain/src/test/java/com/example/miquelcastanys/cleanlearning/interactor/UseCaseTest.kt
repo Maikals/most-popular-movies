@@ -1,10 +1,9 @@
 package com.example.miquelcastanys.cleanlearning.interactor
 
+import com.example.domain.base.BaseUseCase
 import com.example.domain.executor.PostExecutionThread
-import com.example.domain.interactor.UseCase
 import com.nhaarman.mockito_kotlin.given
 import io.reactivex.Single
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.TestScheduler
 import org.junit.Before
@@ -47,10 +46,8 @@ class UseCaseTest {
     }
 
 
-    private class UseCaseTestClass(override val postExecutionThread: PostExecutionThread,
-                                   val single: Single<Any>,
-                                   override val disposables: CompositeDisposable = CompositeDisposable()) : UseCase<Any, Params> {
-
+    private class UseCaseTestClass(postExecutionThread: PostExecutionThread,
+                                   val single: Single<Any>) : BaseUseCase<Any, Params>(postExecutionThread) {
 
         override fun buildUseCaseObservable(params: Params): Single<Any> {
             return single
