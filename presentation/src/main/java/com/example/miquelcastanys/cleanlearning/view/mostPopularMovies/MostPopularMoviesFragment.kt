@@ -101,7 +101,10 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                if (isSearchExpanded) searchMovie(newText)
+                if (isSearchExpanded) {
+                    stopScroll()
+                    searchMovie(newText)
+                }
                 return true
             }
 
@@ -121,6 +124,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
             override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
                 isSearchExpanded = false
                 animateSearchToolbar(1, false, false)
+                stopScroll()
                 searchClosed()
                 getMostPopularMovies()
                 return true
@@ -128,6 +132,10 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
         })
         super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun stopScroll() {
+        mostPopularMoviesRV.stopScroll()
     }
 
     override fun setupFragmentComponent() {
@@ -201,7 +209,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     override fun setItems(moviesList: List<BaseListViewEntity>) {
         mostPopularMoviesRV?.let {
             if (mostPopularMoviesRV.adapter == null) mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(moviesList)
-
             mostPopularMoviesRV.adapter.notifyDataSetChanged()
         }
     }
