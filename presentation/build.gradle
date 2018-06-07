@@ -13,8 +13,8 @@ android {
         applicationId "com.example.miquelcastanys.cleanlearning"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 3
-        versionName "1.1.1"
+        versionCode 4
+        versionName "1.2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
