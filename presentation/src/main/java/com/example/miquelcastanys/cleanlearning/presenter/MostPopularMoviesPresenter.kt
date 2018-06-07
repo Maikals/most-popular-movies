@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @PerFragment
 class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCase: GetMostPopularMoviesUseCase,
-                                                     private val searchMovies: GetSearchMoviesUseCase) : Presenter {
+                                                     private val searchMoviesUseCase: GetSearchMoviesUseCase) : Presenter {
 
     @Inject
     lateinit var view: MostPopularMoviesView
@@ -42,6 +42,8 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
     override fun destroy() {
         mostPopularMoviesUseCase.dispose()
+        searchMoviesUseCase.dispose()
+
     }
 
     fun loadMoreElements() {
@@ -100,14 +102,14 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
     fun searchMovieByText(newText: String? = "", refreshList: Boolean = false) {
         isSearching = true
-        if (newText != searchString) searchMovies.dispose()
+        if (newText != searchString) searchMoviesUseCase.dispose()
         searchString = newText ?: ""
         if (refreshList) currentPage = 1
-        searchMovies.execute(SearchMoviesParams(currentPage++, searchString), MoviesListObserver(this, refreshList))
+        searchMoviesUseCase.execute(SearchMoviesParams(currentPage++, searchString), MoviesListObserver(this, refreshList))
     }
 
     fun cancelSearch() {
-        searchMovies.dispose()
+        searchMoviesUseCase.dispose()
     }
 
     class MoviesListObserver(private val presenter: MostPopularMoviesPresenter, private val refreshList: Boolean) : DisposableObserver<MovieListEntity>() {

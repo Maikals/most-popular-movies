@@ -41,7 +41,7 @@ class MovieApiModule {
 
     @Provides
     @Singleton
-    fun provideHeroApi(authInterceptor: RequestInterceptor): MostPopularMoviesService {
+    fun mostPopularMoviesApi(authInterceptor: RequestInterceptor): MostPopularMoviesService {
         val httpClient = OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
                 .connectTimeout(ApiConstants.TIMEOUT_CONNECTION_VALUE, TimeUnit.SECONDS)
