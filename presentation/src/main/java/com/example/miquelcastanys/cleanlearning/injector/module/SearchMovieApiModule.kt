@@ -1,26 +1,20 @@
 package com.example.miquelcastanys.cleanlearning.injector.module
 
 import com.example.data.net.ApiConstants
-import com.example.data.net.MostPopularMoviesService
 import com.example.data.net.SearchMoviesService
 import com.example.data.net.interceptor.RequestInterceptor
-import com.example.data.repository.MostPopularMoviesRepositoryImpl
 import com.example.data.repository.SearchMoviesRepositoryImpl
-import com.example.data.repository.dataSource.MostPopularDataStoreImpl
-import com.example.data.repository.dataSource.MostPopularMoviesStore
 import com.example.data.repository.dataSource.SearchMoviesDataStore
 import com.example.data.repository.dataSource.SearchMoviesDataStoreImpl
-import com.example.domain.executor.PostExecutionThread
-import com.example.domain.repository.MostPopularMoviesRepository
 import com.example.domain.repository.SearchMoviesRepository
-import com.example.miquelcastanys.cleanlearning.UIThread
 import dagger.Module
 import dagger.Provides
-import java.util.concurrent.TimeUnit
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import io.reactivex.disposables.CompositeDisposable
 import okhttp3.OkHttpClient
+import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -40,7 +34,7 @@ class SearchMovieApiModule {
 
     @Provides
     @Singleton
-    fun provideHeroApi(authInterceptor: RequestInterceptor): SearchMoviesService {
+    fun searchMoviesApi(authInterceptor: RequestInterceptor): SearchMoviesService {
         val httpClient = OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
                 .connectTimeout(ApiConstants.TIMEOUT_CONNECTION_VALUE, TimeUnit.SECONDS)
