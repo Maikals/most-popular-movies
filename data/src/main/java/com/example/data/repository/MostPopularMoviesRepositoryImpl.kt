@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 
 class MostPopularMoviesRepositoryImpl @Inject constructor(private val mostPopularMoviesStore: MostPopularMoviesStore) : MostPopularMoviesRepository {
-    override fun getMostPopularMovies(page: Int) : Single<MovieListEntity> {
+    override fun getMostPopularMovies(page: Int) : MovieListEntity {
         return mostPopularMoviesStore.getMostPopularMoviesList(page)
     }
 }

@@ -5,5 +5,5 @@ import io.reactivex.Single
 
 
 interface MostPopularMoviesStore {
-    fun getMostPopularMoviesList(page: Int): Single<MovieListEntity>
+    fun getMostPopularMoviesList(page: Int): MovieListEntity
 }

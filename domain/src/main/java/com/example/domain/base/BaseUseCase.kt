@@ -17,7 +17,7 @@ abstract class BaseUseCase<T, Params>(private val postExecutionThread: PostExecu
         else field
 
 
-    fun execute(params: Params, observer: DisposableObserver<T>) {
+    suspend fun execute(params: Params, observer: DisposableObserver<T>) {
         addDisposable(buildUseCaseObservable(params)
                 .subscribeOn(Schedulers.io())
                 .observeOn(postExecutionThread.getScheduler())

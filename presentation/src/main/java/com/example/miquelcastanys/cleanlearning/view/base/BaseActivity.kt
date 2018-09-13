@@ -10,8 +10,6 @@ import kotlinx.android.synthetic.main.activity_base.*
 import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity() {
-    @Inject
-    protected lateinit var navigator: Navigator
     protected var currentTag: String? = null
     protected var currentFragment: Fragment? = null
 

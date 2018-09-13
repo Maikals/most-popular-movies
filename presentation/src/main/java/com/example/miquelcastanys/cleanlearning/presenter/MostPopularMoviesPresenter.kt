@@ -2,8 +2,7 @@ package com.example.miquelcastanys.cleanlearning.presenter
 
 import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
-import com.example.domain.entity.SearchMoviesParams
-import com.example.domain.interactor.GetMostPopularMoviesUseCase
+import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoroutines
 import com.example.domain.interactor.GetSearchMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
@@ -11,11 +10,13 @@ import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresen
 import com.example.miquelcastanys.cleanlearning.injector.PerFragment
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesView
 import io.reactivex.observers.DisposableObserver
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import java.util.*
 import javax.inject.Inject
 
 @PerFragment
-class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCase: GetMostPopularMoviesUseCase,
+class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCaseCoroutines: GetMostPopularMoviesUseCaseCoroutines,
                                                      private val searchMoviesUseCase: GetSearchMoviesUseCase) : Presenter {
 
     @Inject
@@ -41,7 +42,6 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
     override fun pause() {}
 
     override fun destroy() {
-        mostPopularMoviesUseCase.dispose()
         searchMoviesUseCase.dispose()
 
     }
@@ -55,13 +55,22 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
     }
 
     fun getMostPopularMoviesList(refreshList: Boolean = false) {
-        mostPopularMoviesUseCase.execute(MostPopularMoviesParams(currentPage++), MoviesListObserver(this, refreshList))
+//        mostPopularMoviesUseCase.execute(MostPopularMoviesParams(currentPage++), MoviesListObserver(this, refreshList))
+        launch {
+            val moviesListEntity = mostPopularMoviesUseCaseCoroutines.coroutinesTest(MostPopularMoviesParams(currentPage++))
+            launch(UI) {
+                if (moviesListEntity.moviesList.isNotEmpty()) manageMovieListEntityReceived(false, moviesListEntity)
+                else manageEmptyList()
+            }
+        }
+
     }
 
     fun manageMovieListEntityReceived(refreshList: Boolean, moviesListEntity: MovieListEntity) {
         if (refreshList) moviesList.clear()
         setIsLastPage(currentPage, moviesListEntity.totalPages)
         addResultToMoviesList(MoviesListPresentationMapper.toPresentationObject(moviesListEntity))
+        manageList()
     }
 
     fun manageList() {
@@ -105,7 +114,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         if (newText != searchString) searchMoviesUseCase.dispose()
         searchString = newText ?: ""
         if (refreshList) currentPage = 1
-        searchMoviesUseCase.execute(SearchMoviesParams(currentPage++, searchString), MoviesListObserver(this, refreshList))
+//        searchMoviesUseCase.execute(SearchMoviesParams(currentPage++, searchString), MoviesListObserver(this, refreshList))
     }
 
     fun cancelSearch() {

@@ -6,14 +6,11 @@ import com.example.data.net.interceptor.RequestInterceptor
 import com.example.data.repository.MostPopularMoviesRepositoryImpl
 import com.example.data.repository.dataSource.MostPopularDataStoreImpl
 import com.example.data.repository.dataSource.MostPopularMoviesStore
-import com.example.domain.executor.PostExecutionThread
 import com.example.domain.repository.MostPopularMoviesRepository
-import com.example.miquelcastanys.cleanlearning.UIThread
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -35,12 +32,6 @@ class MovieApiModule {
 
     @Provides
     @Singleton
-    fun provideUIThread(uiThread: UIThread): PostExecutionThread {
-        return uiThread
-    }
-
-    @Provides
-    @Singleton
     fun mostPopularMoviesApi(authInterceptor: RequestInterceptor): MostPopularMoviesService {
         val httpClient = OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
@@ -49,8 +40,6 @@ class MovieApiModule {
                 .writeTimeout(ApiConstants.TIMEOUT_WRITE_VALUE, TimeUnit.SECONDS)
         val builder = Retrofit.Builder()
                 .baseUrl(ApiConstants.BASE_URL)
-                .addCallAdapterFactory(
-                        RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
         return builder.client(httpClient.build()).build().create(MostPopularMoviesService::class.java)
     }
