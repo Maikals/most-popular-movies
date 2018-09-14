@@ -10,15 +10,15 @@ import javax.inject.Inject
 
 class GetMostPopularMoviesUseCaseCoroutines @Inject constructor(private val mostPopularMoviesRepository: MostPopularMoviesRepository) {
 
+    var job: Job? = null
 
-    suspend fun coroutinesTest(params: MostPopularMoviesParams): MovieListEntity {
-        var result: MovieListEntity? = null
-        launchAsync{
+    suspend fun coroutinesTest(params: MostPopularMoviesParams, block: (MovieListEntity) -> Unit) {
+        cancel()
+        job = launchAsync{
             asyncAwait {
-                result = mostPopularMoviesRepository.getMostPopularMovies(params.page)
+                block(mostPopularMoviesRepository.getMostPopularMovies(params.page))
             }
         }
-        return result ?: MovieListEntity(-1, -1, listOf())
     }
 
     fun launchAsync(block: suspend CoroutineScope.() -> Unit): Job {
@@ -30,6 +30,12 @@ class GetMostPopularMoviesUseCaseCoroutines @Inject constructor(private val most
     }
     suspend fun <T> asyncAwait(block: suspend CoroutineScope.() -> T): T {
         return async(block).await()
+    }
+
+    fun cancel() {
+        launch {
+            job?.cancelAndJoin()
+        }
     }
 
 }

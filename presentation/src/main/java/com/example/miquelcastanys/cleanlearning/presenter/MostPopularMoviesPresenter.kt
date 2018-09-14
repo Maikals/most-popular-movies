@@ -56,13 +56,13 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
     fun getMostPopularMoviesList(refreshList: Boolean = false) {
 //        mostPopularMoviesUseCase.execute(MostPopularMoviesParams(currentPage++), MoviesListObserver(this, refreshList))
-        launch {
-            val moviesListEntity = mostPopularMoviesUseCaseCoroutines.coroutinesTest(MostPopularMoviesParams(currentPage++))
-            launch(UI) {
-                if (moviesListEntity.moviesList.isNotEmpty()) manageMovieListEntityReceived(false, moviesListEntity)
-                else manageEmptyList()
-            }
-        }
+//        launch {
+//            val moviesListEntity = mostPopularMoviesUseCaseCoroutines.coroutinesTest(MostPopularMoviesParams(currentPage++))
+//            launch(UI) {
+//                if (moviesListEntity.moviesList.isNotEmpty()) manageMovieListEntityReceived(false, moviesListEntity)
+//                else manageEmptyList()
+//            }
+//        }
 
     }
 

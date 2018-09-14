@@ -3,6 +3,8 @@ package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.SearchManager
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.res.Resources
 import android.os.Build
@@ -18,6 +20,7 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.TranslateAnimation
+import com.example.domain.entity.MovieListEntity
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.adapters.MostPopularMovieListAdapter
@@ -26,6 +29,7 @@ import com.example.miquelcastanys.cleanlearning.entities.enumerations.EmptyViewE
 import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
 import com.example.miquelcastanys.cleanlearning.injector.module.MostPopularMoviesModule
 import com.example.miquelcastanys.cleanlearning.interfaces.MostPopularMoviesActivityFragmentInterface
+import com.example.miquelcastanys.cleanlearning.observe
 import com.example.miquelcastanys.cleanlearning.presenter.MostPopularMoviesPresenter
 import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_most_popular_movies.*
@@ -33,10 +37,19 @@ import javax.inject.Inject
 
 
 class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
+
+
+    @Inject
+    lateinit var factory: MostPopularModelFactory
+
     @Inject
     lateinit var presenter: MostPopularMoviesPresenter
+
+    lateinit var viewModel: MostPopularMoviesViewModel
+
     private var searchAction: MenuItem? = null
     var isSearchExpanded: Boolean = false
+    var refresh: Boolean = false
 
     private var mostPopularMoviesActivityFragmentInterface: MostPopularMoviesActivityFragmentInterface? = null
 
@@ -59,12 +72,12 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 if (!presenter.isLastPage && !loading) {
                     if (visibleItemCount + pastVisibleItems >= totalItemCount - 5) {
                         loading = true
-                        presenter.loadMoreElements()
+                        viewModel.getMostPopularMovies()
                     }
                 }
             } else if (linearLayoutManager.findLastVisibleItemPosition() == mostPopularMoviesRV.adapter.itemCount - 1
                     && !presenter.isLastPage) {
-                presenter.loadMoreElements()
+                viewModel.getMostPopularMovies()
                 loading = true
             }
         }
@@ -75,11 +88,22 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setRefreshLayoutBehaviour()
-
         setRecyclerView()
         setEmptyView()
         setHasOptionsMenu(true)
+        createViewModel()
+        viewModel.getMostPopularMovies()
+        observe(viewModel.mostPopularMovies) {
+            presenter.manageMovieListEntityReceived(refresh, it ?: MovieListEntity(-1, -1, listOf()))
+        }
+        observe(viewModel.refresh) {
+            refresh = it ?: false
+        }
         presenter.start()
+    }
+
+    private fun createViewModel() {
+        viewModel = ViewModelProviders.of(this, factory).get(MostPopularMoviesViewModel::class.java)
     }
 
     override fun onResume() {
@@ -169,7 +193,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 if (!presenter.isSearching) {
                     restartListAnimation()
                 }
-                presenter.start()
+                viewModel.getMostPopularMovies(true)
             }
 
     override fun restartListAnimation() {
