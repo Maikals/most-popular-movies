@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModel
 import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoroutines
-import kotlinx.coroutines.experimental.launch
 
 class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCaseCoroutines) : ViewModel() {
 
@@ -16,10 +15,9 @@ class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCas
     fun getMostPopularMovies(refresh: Boolean = false) {
         this.refresh.postValue(refresh)
         if (refresh) page = 1
-        launch {
-            useCase.coroutinesTest(MostPopularMoviesParams(page++)) {
-                mostPopularMovies.postValue(it)
-            }
+        useCase.execute(MostPopularMoviesParams(page++)) {
+            mostPopularMovies.postValue(it)
+
         }
     }
 
