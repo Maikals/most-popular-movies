@@ -12,7 +12,7 @@ import com.example.miquelcastanys.cleanlearning.util.Constants
 import com.example.miquelcastanys.cleanlearning.view.MovieViewHolder
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.FooterViewHolder
 
-class MostPopularMovieListAdapter(var movieList: List<BaseListViewEntity> = listOf()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MostPopularMovieListAdapter(private val movieList: List<BaseListViewEntity>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var lastPosition: Int = -1
 

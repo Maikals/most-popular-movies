@@ -91,10 +91,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         createViewModel()
         viewModel.getMostPopularMovies()
 
-//        observe(viewModel.mostPopularMovies) {
-//            presenter.manageMovieListEntityReceived(refresh, it ?: MovieListEntity(-1, -1, listOf()))
-//        }
-
         if(mostPopularMoviesRV.adapter == null)
             mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(viewModel.mostPopularMovies.value as List<BaseListViewEntity>)
 
