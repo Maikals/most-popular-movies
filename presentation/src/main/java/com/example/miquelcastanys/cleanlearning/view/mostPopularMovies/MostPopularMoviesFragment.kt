@@ -3,7 +3,6 @@ package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.SearchManager
-import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.res.Resources
@@ -20,7 +19,6 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.TranslateAnimation
-import com.example.domain.entity.MovieListEntity
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.adapters.MostPopularMovieListAdapter
@@ -49,7 +47,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     private var searchAction: MenuItem? = null
     var isSearchExpanded: Boolean = false
-    var refresh: Boolean = false
 
     private var mostPopularMoviesActivityFragmentInterface: MostPopularMoviesActivityFragmentInterface? = null
 
@@ -93,12 +90,20 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         setHasOptionsMenu(true)
         createViewModel()
         viewModel.getMostPopularMovies()
-        observe(viewModel.mostPopularMovies) {
-            presenter.manageMovieListEntityReceived(refresh, it ?: MovieListEntity(-1, -1, listOf()))
+
+//        observe(viewModel.mostPopularMovies) {
+//            presenter.manageMovieListEntityReceived(refresh, it ?: MovieListEntity(-1, -1, listOf()))
+//        }
+
+        if(mostPopularMoviesRV.adapter == null)
+            mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(viewModel.mostPopularMovies.value as List<BaseListViewEntity>)
+
+        observe(viewModel.onDataReceived) {
+            showProgressBar(false)
+            showRecyclerView()
+            mostPopularMoviesRV.adapter.notifyDataSetChanged()
         }
-        observe(viewModel.refresh) {
-            refresh = it ?: false
-        }
+
         presenter.start()
     }
 
@@ -231,10 +236,11 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     }
 
     override fun setItems(moviesList: List<BaseListViewEntity>) {
-        mostPopularMoviesRV?.let {
-            if (mostPopularMoviesRV.adapter == null) mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(moviesList)
-            mostPopularMoviesRV.adapter.notifyDataSetChanged()
-        }
+
+//        mostPopularMoviesRV?.let {
+//            if (mostPopularMoviesRV.adapter == null) mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(moviesList)
+//            mostPopularMoviesRV.adapter.notifyDataSetChanged()
+//        }
     }
 
     override fun setLoadingState(state: Boolean) {
