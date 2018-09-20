@@ -95,6 +95,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
             mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(viewModel.mostPopularMovies.value as List<BaseListViewEntity>)
 
         observe(viewModel.onDataReceived) {
+            loading = false
             showProgressBar(false)
             showRecyclerView()
             mostPopularMoviesRV.adapter.notifyDataSetChanged()

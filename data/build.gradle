@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 27
@@ -10,6 +11,8 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
+
+        multiDexEnabled true
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -48,6 +51,9 @@ dependencies {
     kapt 'com.google.dagger:dagger-compiler:2.15'
     implementation 'com.google.dagger:dagger:2.15'
     compileOnly 'org.glassfish:javax.annotation:10.0-b28'
+
+    implementation 'com.android.support:multidex:1.0.3'
+
 
 
     implementation project(':domain')

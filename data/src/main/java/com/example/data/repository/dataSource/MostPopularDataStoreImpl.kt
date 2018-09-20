@@ -1,13 +1,22 @@
 package com.example.data.repository.dataSource
 
+import com.example.data.db.RealmHelper
 import com.example.data.entity.MovieListDTO
 import com.example.data.entity.mapper.MovieListMapper
 import com.example.data.net.MostPopularMoviesService
+import com.example.domain.entity.MovieEntity
 import com.example.domain.entity.MovieListEntity
 import javax.inject.Inject
 
 
-class MostPopularDataStoreImpl @Inject constructor(private val mostPopularMoviesService: MostPopularMoviesService) : MostPopularMoviesStore {
+class MostPopularDataStoreImpl @Inject constructor(private val mostPopularMoviesService: MostPopularMoviesService,
+                                                   private val realmHelper: RealmHelper) : MostPopularMoviesStore {
+    override fun setMostPopularMoviesLocal(moviesList: List<MovieEntity>) =
+            realmHelper.setMostPopularList(moviesList)
+
+    override fun getMostPopularMoviesLocal(): MovieListEntity =
+            MovieListEntity(-1, -1, realmHelper.getMostPopularList())
+
     override fun getMostPopularMoviesList(page: Int): MovieListEntity =
             MovieListMapper.toDomainObject(mostPopularMoviesService.getMostPopularMoviesList(page).execute().body()
                     ?: MovieListDTO(-1, 0, 0, listOf()))
