@@ -1,17 +1,22 @@
 package com.example.miquelcastanys.cleanlearning.view.base
 
 import android.os.Bundle
+import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
-import com.example.miquelcastanys.cleanlearning.navigation.Navigator
+import com.example.miquelcastanys.cleanlearning.observe
 import kotlinx.android.synthetic.main.activity_base.*
 import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity() {
     protected var currentTag: String? = null
     protected var currentFragment: Fragment? = null
+
+    @Inject
+    lateinit var reachAbilitySingleViewModel: ReachAbilitySingleViewModel
 
     companion object {
         private const val CURRENT_FRAGMENT_TAG: String = "currentTag"
@@ -24,6 +29,20 @@ abstract class BaseActivity : AppCompatActivity() {
         setupActivityComponent()
         initializeFragmentAndTAG(savedInstanceState)
         beginTransaction()
+
+        observe(reachAbilitySingleViewModel.isBackOfficeReachable){
+
+            onConnectivityChanges(it?:false)
+        }
+
+        observe(reachAbilitySingleViewModel.isVUEReachable){
+            Toast.makeText(this,"VUE REACHABLE: $it",Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    @CallSuper
+    open fun onConnectivityChanges(isConnected:Boolean){
+        Toast.makeText(this,"INTERNET: $isConnected",Toast.LENGTH_SHORT).show()
     }
 
     private fun setToolbar() {
