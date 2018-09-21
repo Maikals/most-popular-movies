@@ -3,11 +3,11 @@ package com.example.miquelcastanys.cleanlearning.view.base
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
-import com.example.miquelcastanys.cleanlearning.navigation.Navigator
 import kotlinx.android.synthetic.main.activity_base.*
-import javax.inject.Inject
+
 
 abstract class BaseActivity : AppCompatActivity() {
     protected var currentTag: String? = null
@@ -24,6 +24,14 @@ abstract class BaseActivity : AppCompatActivity() {
         setupActivityComponent()
         initializeFragmentAndTAG(savedInstanceState)
         beginTransaction()
+    }
+
+    private fun showConnectivityBackofficeToast(isConnectedToInternet: Boolean) {
+        Toast.makeText(this, if (isConnectedToInternet) "Connection Backoffice OK" else "Connection Backoffice KO", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showConnectivityGoogleToast(isConnectedToInternet: Boolean) {
+        Toast.makeText(this, if (isConnectedToInternet) "Connection Google OK" else "Connection Google KO", Toast.LENGTH_SHORT).show()
     }
 
     private fun setToolbar() {

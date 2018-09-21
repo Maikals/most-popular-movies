@@ -19,6 +19,7 @@ class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCas
 
     fun getMostPopularMovies(refresh: Boolean = false) {
         if (refresh) currentPage = 1
+        mostPopularMovies
 
         useCase.execute(MostPopularMoviesParams(currentPage++)) {
             manageMovieListEntityReceived(refresh, it)

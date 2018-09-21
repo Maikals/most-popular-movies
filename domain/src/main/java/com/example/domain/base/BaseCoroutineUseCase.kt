@@ -1,7 +1,7 @@
 package com.example.domain.base
 
 import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.android.Main
 
 abstract class BaseCoroutineUseCase<T, Params> {
 
@@ -19,11 +19,13 @@ abstract class BaseCoroutineUseCase<T, Params> {
     abstract fun buildRepoCall(params: Params) : T
 
     fun launchAsync(block: suspend CoroutineScope.() -> Unit) {
-        job = launch(UI) { block() }
+        job = GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, {
+
+        }, { block() })
     }
 
     suspend fun <T> async(block: suspend CoroutineScope.() -> T): Deferred<T> {
-        return async(CommonPool) { block() }
+        return GlobalScope.async(Dispatchers.Default, CoroutineStart.DEFAULT, null, { block() })
     }
 
     suspend fun <T> asyncAwait(block: suspend CoroutineScope.() -> T): T {
@@ -31,8 +33,8 @@ abstract class BaseCoroutineUseCase<T, Params> {
     }
 
     fun cancel() {
-        launch {
+        GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
             job?.cancelAndJoin()
-        }
+        })
     }
 }
