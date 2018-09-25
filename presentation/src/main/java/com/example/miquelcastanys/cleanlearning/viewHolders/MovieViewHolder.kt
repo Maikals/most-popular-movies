@@ -1,11 +1,10 @@
-package com.example.miquelcastanys.cleanlearning.view
+package com.example.miquelcastanys.cleanlearning.viewHolders
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.entities.MovieViewEntity
-import com.example.miquelcastanys.cleanlearning.glideModule.GlideApp
-import com.example.miquelcastanys.cleanlearning.util.Constants
+import com.example.miquelcastanys.cleanlearning.util.loadImage
 import kotlinx.android.synthetic.main.list_item_movie.view.*
 
 class MovieViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
@@ -18,11 +17,6 @@ class MovieViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
     }
 
     private fun loadImage(imageUrl: String) {
-        GlideApp
-                .with(view)
-                .load("${Constants.BASE_IMAGE_URL}$imageUrl")
-                .placeholder(R.drawable.ic_empty_view_white)
-                .centerCrop()
-                .into(view.movieImage)
+        view.movieImage.loadImage(imageUrl)
     }
 }

@@ -1,5 +1,6 @@
 package com.example.miquelcastanys.cleanlearning.presenter
 
+import android.view.View
 import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.entity.SearchMoviesParams
@@ -9,6 +10,7 @@ import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
 import com.example.miquelcastanys.cleanlearning.injector.PerFragment
+import com.example.miquelcastanys.cleanlearning.navigation.Navigator
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesView
 import io.reactivex.observers.DisposableObserver
 import java.util.*
@@ -20,6 +22,8 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
     @Inject
     lateinit var view: MostPopularMoviesView
+    @Inject
+    lateinit var navigator: Navigator
     val moviesList: ArrayList<BaseListViewEntity> = ArrayList()
     var isLastPage = false
     private var currentPage = 1
@@ -83,6 +87,9 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         view.setLoadingState(false)
     }
 
+    fun openMovieDetail(movieId: String) {
+        navigator.toMovieDetail(view.provideContext(), movieId, View(view.provideContext()))
+    }
 
     private fun addFooter() {
         moviesList.add(FooterViewViewEntity())

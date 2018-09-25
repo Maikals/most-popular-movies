@@ -172,6 +172,10 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 presenter.start()
             }
 
+    override fun provideContext(): Context {
+        return activity as Context
+    }
+
     override fun restartListAnimation() {
         (mostPopularMoviesRV?.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()
     }

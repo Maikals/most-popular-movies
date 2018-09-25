@@ -9,8 +9,8 @@ import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.MovieViewEntity
 import com.example.miquelcastanys.cleanlearning.inflateFromLayout
 import com.example.miquelcastanys.cleanlearning.util.Constants
-import com.example.miquelcastanys.cleanlearning.view.MovieViewHolder
-import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.FooterViewHolder
+import com.example.miquelcastanys.cleanlearning.viewHolders.FooterViewHolder
+import com.example.miquelcastanys.cleanlearning.viewHolders.MovieViewHolder
 
 class MostPopularMovieListAdapter(private val movieList: List<BaseListViewEntity>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

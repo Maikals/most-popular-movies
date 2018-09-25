@@ -21,12 +21,14 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_base)
+        setContentView(getActivityLayout())
         setToolbar()
         setupActivityComponent()
         initializeFragmentAndTAG(savedInstanceState)
         beginTransaction()
     }
+
+    abstract fun getActivityLayout(): Int
 
     private fun setToolbar() {
         setSupportActionBar(toolbar)

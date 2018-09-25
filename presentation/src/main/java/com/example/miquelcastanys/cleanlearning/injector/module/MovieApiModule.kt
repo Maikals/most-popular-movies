@@ -6,9 +6,7 @@ import com.example.data.net.interceptor.RequestInterceptor
 import com.example.data.repository.MostPopularMoviesRepositoryImpl
 import com.example.data.repository.dataSource.MostPopularDataStoreImpl
 import com.example.data.repository.dataSource.MostPopularMoviesStore
-import com.example.domain.executor.PostExecutionThread
 import com.example.domain.repository.MostPopularMoviesRepository
-import com.example.miquelcastanys.cleanlearning.UIThread
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -31,12 +29,6 @@ class MovieApiModule {
     @Singleton
     fun provideMostPopularMoviesRepository(mostPopularMoviesRepositoryImpl: MostPopularMoviesRepositoryImpl): MostPopularMoviesRepository {
         return mostPopularMoviesRepositoryImpl
-    }
-
-    @Provides
-    @Singleton
-    fun provideUIThread(uiThread: UIThread): PostExecutionThread {
-        return uiThread
     }
 
     @Provides

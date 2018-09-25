@@ -1,4 +1,4 @@
-package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
+package com.example.miquelcastanys.cleanlearning.viewHolders
 
 import android.support.v7.widget.RecyclerView
 import android.view.View

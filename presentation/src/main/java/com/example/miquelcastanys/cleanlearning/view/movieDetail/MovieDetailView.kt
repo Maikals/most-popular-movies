@@ -1,11 +1,11 @@
-package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
+package com.example.miquelcastanys.cleanlearning.view.movieDetail
 
 import android.content.Context
-import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
+import com.example.miquelcastanys.cleanlearning.entities.MovieDetailViewEntity
 
 
-interface MostPopularMoviesView {
-    fun setItems(moviesList: List<BaseListViewEntity>)
+interface MovieDetailView {
+    fun setDetail(movie: MovieDetailViewEntity)
 
     fun showProgressBar(show: Boolean)
 

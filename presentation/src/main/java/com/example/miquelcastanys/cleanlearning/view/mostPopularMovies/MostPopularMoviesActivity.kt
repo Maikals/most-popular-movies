@@ -20,6 +20,8 @@ class MostPopularMoviesActivity : BaseActivity(), MostPopularMoviesActivityFragm
         setTitle(R.string.app_name)
     }
 
+    override fun getActivityLayout(): Int = R.layout.activity_base
+
     override fun getToolbar(): Toolbar = toolbar
 
 }
