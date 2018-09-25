@@ -9,14 +9,11 @@ import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.observe
 import kotlinx.android.synthetic.main.activity_base.*
-import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity() {
     protected var currentTag: String? = null
     protected var currentFragment: Fragment? = null
 
-    @Inject
-    lateinit var reachAbilitySingleViewModel: ReachAbilitySingleViewModel
 
     companion object {
         private const val CURRENT_FRAGMENT_TAG: String = "currentTag"
@@ -30,19 +27,19 @@ abstract class BaseActivity : AppCompatActivity() {
         initializeFragmentAndTAG(savedInstanceState)
         beginTransaction()
 
-        observe(reachAbilitySingleViewModel.isBackOfficeReachable){
+        observe(ReachAbilityManager.isPrimaryAddressReachAble) {
 
-            onConnectivityChanges(it?:false)
+            onConnectivityChanges(it ?: false)
         }
 
-        observe(reachAbilitySingleViewModel.isVUEReachable){
-            Toast.makeText(this,"VUE REACHABLE: $it",Toast.LENGTH_SHORT).show()
+        observe(ReachAbilityManager.isSecondaryAddressReachAble) {
+            Toast.makeText(this, "VUE REACHABLE: $it", Toast.LENGTH_SHORT).show()
         }
     }
 
     @CallSuper
-    open fun onConnectivityChanges(isConnected:Boolean){
-        Toast.makeText(this,"INTERNET: $isConnected",Toast.LENGTH_SHORT).show()
+    open fun onConnectivityChanges(isConnected: Boolean) {
+       //set a general param.
     }
 
     private fun setToolbar() {

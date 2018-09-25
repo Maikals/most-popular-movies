@@ -1,10 +1,10 @@
-
 package com.example.miquelcastanys.cleanlearning
 
 import android.app.Application
 import com.example.miquelcastanys.cleanlearning.injector.component.ApplicationComponent
 import com.example.miquelcastanys.cleanlearning.injector.component.DaggerApplicationComponent
 import com.example.miquelcastanys.cleanlearning.injector.module.ApplicationModule
+import com.example.miquelcastanys.cleanlearning.view.base.ReachAbilityManager
 
 
 class MostPopularMoviesApplication : Application() {
@@ -19,5 +19,8 @@ class MostPopularMoviesApplication : Application() {
         super.onCreate()
         instance = this
         applicationComponent = DaggerApplicationComponent.builder().applicationModule(ApplicationModule(this)).build()
+
+        ReachAbilityManager.initializeParams("vetscanvue.abaxis.com","192.168.1.101")
+//        ReachAbilityManager.checkSecondaryHostEnabled = false
     }
 }

@@ -27,10 +27,4 @@ class ApplicationModule(private val application: MostPopularMoviesApplication) {
         return uiThread
     }
 
-
-    @Provides
-    @Singleton
-    fun provideReachAbility(reachAbilityImpl: ReachAbilityImpl) : ReachAbility{
-        return reachAbilityImpl
-    }
 }

@@ -4,6 +4,11 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <Button
+        android:id="@+id/open_new_activity_button"
+        android:text="new activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"

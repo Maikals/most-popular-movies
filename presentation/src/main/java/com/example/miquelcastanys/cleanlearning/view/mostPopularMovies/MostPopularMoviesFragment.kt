@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.app.SearchManager
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
@@ -30,6 +31,7 @@ import com.example.miquelcastanys.cleanlearning.interfaces.MostPopularMoviesActi
 import com.example.miquelcastanys.cleanlearning.observe
 import com.example.miquelcastanys.cleanlearning.presenter.MostPopularMoviesPresenter
 import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
+import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.NewActivityDemo
 import kotlinx.android.synthetic.main.fragment_most_popular_movies.*
 import javax.inject.Inject
 
@@ -91,7 +93,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         createViewModel()
         viewModel.getMostPopularMovies()
 
-        if(mostPopularMoviesRV.adapter == null)
+        if (mostPopularMoviesRV.adapter == null)
             mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(viewModel.mostPopularMovies.value as List<BaseListViewEntity>)
 
         observe(viewModel.onDataReceived) {
@@ -101,6 +103,10 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         }
 
         presenter.start()
+
+        open_new_activity_button.setOnClickListener {
+            startActivity(Intent(activity, NewActivityDemo::class.java))
+        }
     }
 
     private fun createViewModel() {

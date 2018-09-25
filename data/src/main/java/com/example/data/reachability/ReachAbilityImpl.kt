@@ -1,32 +1,48 @@
 package com.example.data.reachability
 
+import com.example.domain.entity.InternetAddress
 import com.example.domain.repository.ReachAbility
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
-import javax.inject.Inject
 
-class ReachAbilityImpl @Inject constructor() : ReachAbility {
+class ReachAbilityImpl : ReachAbility {
 
-    private lateinit var socket: Socket
     private val TAG = "ReachAbilityImpl"
 
-    override fun checkHost(host: ArrayList<String>): Map<String, Boolean> =
-            host.map {
-                it to isConnected(it, 443)
-            }.toMap()
+    override fun checkHost(host: ArrayList<InternetAddress>): ArrayList<InternetAddress> {
+        val resultArray: ArrayList<InternetAddress> = arrayListOf()
+        host.forEach { it ->
+
+            val internetAddress = InternetAddress(it.host, it.port)
+
+            var retries = 3
+            var isReachAble = isConnected(internetAddress)
+
+            while (!isReachAble && retries > 0) {
+                isReachAble = isConnected(internetAddress)
+                retries--
+            }
+
+            internetAddress.isReachAble = isReachAble
+
+            resultArray.add(internetAddress)
+        }
+        return resultArray
+    }
 
 
-    fun isConnected(host: String, port: Int): Boolean {
-        socket = Socket()
+    fun isConnected(internetAddress: InternetAddress): Boolean {
+        val socket = Socket()
         var isConnected: Boolean
         try {
 
-            socket.connect(InetSocketAddress(host, port), 500)
-            isConnected = socket.isConnected
+            socket.connect(InetSocketAddress(internetAddress.host, internetAddress.port), 500)
+            isConnected = true
+            println("$TAG: Ping to host: ${internetAddress.host}")
         } catch (e: IOException) {
             isConnected = false
-           // println(TAG + " Could not close the socket: " + e.printStackTrace())
+            println("$TAG: Error during ping to ${internetAddress.host}:" + e.printStackTrace())
         } finally {
             try {
                 socket.close()
