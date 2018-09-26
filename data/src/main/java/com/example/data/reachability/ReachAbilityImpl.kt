@@ -16,10 +16,11 @@ class ReachAbilityImpl : ReachAbility {
 
             val internetAddress = InternetAddress(it.host, it.port)
 
-            var retries = 3
+            var retries = 5
             var isReachAble = isConnected(internetAddress)
 
             while (!isReachAble && retries > 0) {
+                Thread.sleep(2000)
                 isReachAble = isConnected(internetAddress)
                 retries--
             }

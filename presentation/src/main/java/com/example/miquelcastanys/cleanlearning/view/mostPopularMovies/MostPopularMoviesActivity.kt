@@ -23,7 +23,7 @@ class MostPopularMoviesActivity : BaseActivity(), MostPopularMoviesActivityFragm
 
     override fun onConnectivityChanges(isConnected: Boolean) {
         super.onConnectivityChanges(isConnected)
-        Toast.makeText(this, "MostPopularMoviesActivity INTERNET: $isConnected", Toast.LENGTH_SHORT).show()
+        println("INTERNET STATE AFTER PING: $isConnected")
     }
 
     override fun getToolbar(): Toolbar = toolbar

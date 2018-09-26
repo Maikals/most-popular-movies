@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.widget.Toast
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
-import com.example.miquelcastanys.cleanlearning.observe
 import kotlinx.android.synthetic.main.activity_base.*
 
 abstract class BaseActivity : AppCompatActivity() {
@@ -26,20 +24,22 @@ abstract class BaseActivity : AppCompatActivity() {
         setupActivityComponent()
         initializeFragmentAndTAG(savedInstanceState)
         beginTransaction()
+    }
 
-        observe(ReachAbilityManager.isPrimaryAddressReachAble) {
-
-            onConnectivityChanges(it ?: false)
+    override fun onResume() {
+        super.onResume()
+        ReachAbilityManager.setPrimaryHostListener {
+            onConnectivityChanges(it)
         }
 
-        observe(ReachAbilityManager.isSecondaryAddressReachAble) {
-            Toast.makeText(this, "VUE REACHABLE: $it", Toast.LENGTH_SHORT).show()
+        ReachAbilityManager.setSecondaryHostListener {
+            onConnectivityChanges(it)
         }
     }
 
     @CallSuper
     open fun onConnectivityChanges(isConnected: Boolean) {
-       //set a general param.
+        //set a general param.
     }
 
     private fun setToolbar() {

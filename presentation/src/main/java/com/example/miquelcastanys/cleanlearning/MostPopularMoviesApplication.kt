@@ -20,7 +20,9 @@ class MostPopularMoviesApplication : Application() {
         instance = this
         applicationComponent = DaggerApplicationComponent.builder().applicationModule(ApplicationModule(this)).build()
 
+        ReachAbilityManager.registerReceiver(this)
         ReachAbilityManager.initializeParams("vetscanvue.abaxis.com","192.168.1.101")
+
 //        ReachAbilityManager.checkSecondaryHostEnabled = false
     }
 }
