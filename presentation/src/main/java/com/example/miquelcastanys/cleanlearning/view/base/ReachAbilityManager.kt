@@ -17,10 +17,10 @@ object ReachAbilityManager : BroadcastReceiver() {
     private var useCase = CheckInternetConnectionUseCase(ReachAbilityImpl())
 
     private var primaryAddress = InternetAddress("")
-    private lateinit var primaryHostBlock: (Boolean) -> Unit
+    lateinit var primaryHostListener: (Boolean) -> Unit
 
     private var secondaryAddress = InternetAddress("")
-    private lateinit var secondaryHostBlock: (Boolean) -> Unit
+    lateinit var secondaryHostListener: (Boolean) -> Unit
     var checkSecondaryHostEnabled = false
 
     fun initializeParams(primaryHost: String, secondaryHost: String, primaryPort: Int = 443,
@@ -29,13 +29,6 @@ object ReachAbilityManager : BroadcastReceiver() {
         this.secondaryAddress = InternetAddress(secondaryHost, secondaryPort)
     }
 
-    fun setPrimaryHostListener(primaryHostBlock: (Boolean) -> Unit) {
-        this.primaryHostBlock = primaryHostBlock
-    }
-
-    fun setSecondaryHostListener(secundaryHostBlock: (Boolean) -> Unit) {
-        this.secondaryHostBlock = secundaryHostBlock
-    }
 
     fun registerReceiver(context: Context?) {
         context?.registerReceiver(this, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
@@ -63,10 +56,10 @@ object ReachAbilityManager : BroadcastReceiver() {
                             primaryAddress.isReachAble = false
                             secondaryAddress.isReachAble = false
 
-                            primaryHostBlock(false)
+                            primaryHostListener(false)
 
                             if (checkSecondaryHostEnabled) {
-                                secondaryHostBlock(false)
+                                secondaryHostListener(false)
                             }
                         }
 
@@ -79,32 +72,31 @@ object ReachAbilityManager : BroadcastReceiver() {
 
     fun start() {
 
-        useCase.execute(ReachAbilityCallParams(buildArrayFromHosts())) { arrayInternetAddress ->
-
-            arrayInternetAddress.forEach {
+        useCase.execute(ReachAbilityCallParams(buildArrayFromHosts()), {
+            it.host.forEach {
 
                 when (it.host) {
 
                     primaryAddress.host -> {
                         if (it.isReachAble != primaryAddress.isReachAble) {
                             primaryAddress.isReachAble = it.isReachAble
-                            primaryHostBlock(primaryAddress.isReachAble)
+                            primaryHostListener(primaryAddress.isReachAble)
                         }
                     }
 
                     secondaryAddress.host -> {
                         if (it.isReachAble != secondaryAddress.isReachAble) {
                             secondaryAddress.isReachAble = it.isReachAble
-                            secondaryHostBlock(secondaryAddress.isReachAble)
+                            secondaryHostListener(secondaryAddress.isReachAble)
                         }
                     }
                 }
 
             }
 
-        }
+        }, {
 
-
+        })
     }
 
     private fun buildArrayFromHosts(): ArrayList<InternetAddress> {

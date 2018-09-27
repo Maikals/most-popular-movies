@@ -2,7 +2,6 @@ package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
 
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
-import android.widget.Toast
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.interfaces.MostPopularMoviesActivityFragmentInterface
 import com.example.miquelcastanys.cleanlearning.view.base.BaseActivity

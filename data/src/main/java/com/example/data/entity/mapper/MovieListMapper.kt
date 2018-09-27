@@ -7,14 +7,15 @@ import com.example.domain.entity.MovieListEntity
 
 
 object MovieListMapper {
-    fun toDomainObject(movieListDTO: MovieListDTO): MovieListEntity =
-            MovieListEntity(movieListDTO.page ?: 0,
+    fun toDomainObject(movieListDTO: MovieListDTO?): MovieListEntity =
+            if (movieListDTO != null) MovieListEntity(movieListDTO.page ?: 0,
                     movieListDTO.total_pages ?: 0,
                     movieListDTO.results
                             .filter { it.id != null }
                             .map {
                                 movieEntityFromMovieDTO(it)
-                            })
+                            }, true)
+            else MovieListEntity(-1, -1, listOf(), false)
 
     private fun movieEntityFromMovieDTO(movieDTO: MovieDTO): MovieEntity {
         return MovieEntity(movieDTO.id ?: 0,

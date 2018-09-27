@@ -1,8 +1,7 @@
 package com.example.miquelcastanys.cleanlearning.presenter
 
-import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
-import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoroutines
+import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoRoutines
 import com.example.domain.interactor.GetSearchMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
@@ -10,13 +9,11 @@ import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresen
 import com.example.miquelcastanys.cleanlearning.injector.PerFragment
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesView
 import io.reactivex.observers.DisposableObserver
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import java.util.*
 import javax.inject.Inject
 
 @PerFragment
-class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCaseCoroutines: GetMostPopularMoviesUseCaseCoroutines,
+class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCaseCoRoutines: GetMostPopularMoviesUseCaseCoRoutines,
                                                      private val searchMoviesUseCase: GetSearchMoviesUseCase) : Presenter {
 
     @Inject
@@ -79,7 +76,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         view.setItems(moviesList)
         view.hideEmptyView()
         view.showRecyclerView()
-        view.setLoadingState(false)
+//        view.setLoadingState(false)
         view.showProgressBar(false)
     }
 
@@ -89,7 +86,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         view.showProgressBar(false)
         view.hideRecyclerView()
         view.showEmptyView()
-        view.setLoadingState(false)
+//        view.setLoadingState(false)
     }
 
 

@@ -16,8 +16,6 @@ interface MostPopularMoviesView {
 
     fun showEmptyView()
 
-    fun setLoadingState(state: Boolean)
-
     fun restartListAnimation()
 
 }

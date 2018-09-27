@@ -1,28 +1,38 @@
 package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
 
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
-import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoroutines
+import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoRoutines
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
+import com.example.miquelcastanys.cleanlearning.view.base.BaseViewModel
 
-class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCaseCoroutines) : ViewModel() {
+
+class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCaseCoRoutines) : BaseViewModel() {
 
     var currentPage = 1
     val mostPopularMovies = MutableLiveData<ArrayList<BaseListViewEntity>>().apply {
         value = ArrayList()
     }
-    val onDataReceived = MutableLiveData<Unit>()
+    val onDataReceived = MutableLiveData<Boolean>()
+    private var loading: Boolean = false
 
-    fun getMostPopularMovies(refresh: Boolean = false) {
-        if (refresh) currentPage = 1
-
-        useCase.execute(MostPopularMoviesParams(currentPage++)) {
-            manageMovieListEntityReceived(refresh, it)
-            onDataReceived.postValue(Unit)
+    @Synchronized fun getMostPopularMovies(refresh: Boolean = false) {
+        if (!loading) {
+            loading = true
+            if (refresh) currentPage = 1
+            execute(useCase, MostPopularMoviesParams(currentPage++), {
+                if (it.result) {
+                    manageMovieListEntityReceived(refresh, it)
+                }
+                onDataReceived.postValue(it.result)
+                loading = false
+            }, {
+                onDataReceived.postValue(false)
+                loading = false
+            })
         }
     }
 

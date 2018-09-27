@@ -1,6 +1,8 @@
 package com.example.data.reachability
 
 import com.example.domain.entity.InternetAddress
+import com.example.domain.entity.ReachAbilityCallParams
+import com.example.domain.entity.ReachAbilityEntity
 import com.example.domain.repository.ReachAbility
 import java.io.IOException
 import java.net.InetSocketAddress
@@ -10,10 +12,11 @@ class ReachAbilityImpl : ReachAbility {
 
     private val TAG = "ReachAbilityImpl"
 
-    override fun checkHost(host: ArrayList<InternetAddress>): ArrayList<InternetAddress> {
-        val resultArray: ArrayList<InternetAddress> = arrayListOf()
-        host.forEach { it ->
+    override fun checkHost(host: ReachAbilityCallParams): ReachAbilityEntity {
 
+        val resultArray: ArrayList<InternetAddress> = arrayListOf()
+
+        host.host.forEach { it ->
             val internetAddress = InternetAddress(it.host, it.port)
 
             var retries = 5
@@ -29,7 +32,9 @@ class ReachAbilityImpl : ReachAbility {
 
             resultArray.add(internetAddress)
         }
-        return resultArray
+
+        return ReachAbilityEntity(resultArray, resultArray.size > 0)
+
     }
 
 

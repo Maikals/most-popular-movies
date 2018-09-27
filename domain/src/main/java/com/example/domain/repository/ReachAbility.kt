@@ -1,7 +1,8 @@
 package com.example.domain.repository
 
-import com.example.domain.entity.InternetAddress
+import com.example.domain.entity.ReachAbilityCallParams
+import com.example.domain.entity.ReachAbilityEntity
 
 interface ReachAbility {
-    fun checkHost(host: ArrayList<InternetAddress>) : ArrayList<InternetAddress>
+    fun checkHost(host: ReachAbilityCallParams) : ReachAbilityEntity
 }

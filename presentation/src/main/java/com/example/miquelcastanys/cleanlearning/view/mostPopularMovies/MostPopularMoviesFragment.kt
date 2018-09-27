@@ -10,6 +10,7 @@ import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -38,7 +39,6 @@ import javax.inject.Inject
 
 class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
-
     @Inject
     lateinit var factory: MostPopularModelFactory
 
@@ -60,7 +60,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
     private val linearLayoutManager: LinearLayoutManager = LinearLayoutManager(context,
             LinearLayoutManager.VERTICAL,
             false)
-    private var loading: Boolean = false
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
@@ -68,16 +67,14 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 val visibleItemCount = linearLayoutManager.childCount
                 val totalItemCount = linearLayoutManager.itemCount
                 val pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition()
-                if (!presenter.isLastPage && !loading) {
+                if (!presenter.isLastPage) {
                     if (visibleItemCount + pastVisibleItems >= totalItemCount - 5) {
-                        loading = true
                         viewModel.getMostPopularMovies()
                     }
                 }
             } else if (linearLayoutManager.findLastVisibleItemPosition() == mostPopularMoviesRV.adapter.itemCount - 1
                     && !presenter.isLastPage) {
                 viewModel.getMostPopularMovies()
-                loading = true
             }
         }
     }
@@ -96,10 +93,16 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         if (mostPopularMoviesRV.adapter == null)
             mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(viewModel.mostPopularMovies.value as List<BaseListViewEntity>)
 
-        observe(viewModel.onDataReceived) {
-            showProgressBar(false)
-            showRecyclerView()
-            mostPopularMoviesRV.adapter.notifyDataSetChanged()
+        observe(viewModel.onDataReceived) { result ->
+            result?.let {
+                if(it) {
+                    showProgressBar(false)
+                    showRecyclerView()
+                    mostPopularMoviesRV.adapter.notifyDataSetChanged()
+                }else{
+                    showProgressBar(false)
+                }
+            }
         }
 
         presenter.start()
@@ -196,7 +199,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     private fun setRefreshLayoutBehaviour() =
             swipeRefreshLayout.setOnRefreshListener {
-                loading = true
                 if (!presenter.isSearching) {
                     restartListAnimation()
                 }
@@ -243,10 +245,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 //            if (mostPopularMoviesRV.adapter == null) mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(moviesList)
 //            mostPopularMoviesRV.adapter.notifyDataSetChanged()
 //        }
-    }
-
-    override fun setLoadingState(state: Boolean) {
-        loading = state
     }
 
     private fun unattachScrollListener() =
@@ -367,6 +365,12 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     fun getMostPopularMovies() {
         presenter.start()
+    }
+
+    override fun showErrorMessage(message: String) {
+        super.showErrorMessage(message)
+        Snackbar.make(activity_most_popular_movies_container, message, Snackbar.LENGTH_SHORT).show()
+        swipeRefreshLayout.isRefreshing = false
     }
 }
 

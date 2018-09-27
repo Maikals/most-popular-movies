@@ -1,0 +1,19 @@
+package com.example.domain.exceptions
+
+enum class ExceptionType {
+    UNDEFINED,
+    CONNECTION_ERROR,
+    CREATE_FILE_ERROR,
+    TOKEN_ERROR,
+    BAD_REQUEST,
+    JSON_EXCEPTION,
+    IO_EXCEPTION,
+    SAVING_ERROR,
+    ERROR_SENDING_FILE,
+    PREFERENCES_ERROR,
+    EMAIL_ALREADY_USED,
+    LOGIN_INCORRECT,
+    LOGIN_NOT_CONFIRMED,
+    FILE_SIZE_ERROR,
+    DEFAULT
+}
