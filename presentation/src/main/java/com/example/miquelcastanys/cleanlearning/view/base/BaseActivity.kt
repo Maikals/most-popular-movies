@@ -45,7 +45,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     @CallSuper
     open fun showErrorMessage(message:String){
-        Log.d("SHOW_ERROR",message)
+        Log.d("BaseActivity",message)
     }
 
     @CallSuper

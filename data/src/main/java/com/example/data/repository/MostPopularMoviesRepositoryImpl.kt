@@ -12,6 +12,7 @@ class MostPopularMoviesRepositoryImpl @Inject constructor(private val mostPopula
     @Throws(CustomException::class)
     override fun getMostPopularMovies(page: Int) : MovieListEntity =
             try {
+                Thread.sleep(10000)
                 mostPopularMoviesStore.getMostPopularMoviesList(page)
             } catch (e: Exception) {
                 throw CustomException(e, ExceptionType.UNDEFINED)

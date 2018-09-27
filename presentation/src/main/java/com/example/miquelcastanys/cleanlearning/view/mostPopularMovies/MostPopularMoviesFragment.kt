@@ -95,11 +95,11 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
         observe(viewModel.onDataReceived) { result ->
             result?.let {
-                if(it) {
+                if (it) {
                     showProgressBar(false)
                     showRecyclerView()
                     mostPopularMoviesRV.adapter.notifyDataSetChanged()
-                }else{
+                } else {
                     showProgressBar(false)
                 }
             }
@@ -367,8 +367,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         presenter.start()
     }
 
-    override fun showErrorMessage(message: String) {
-        super.showErrorMessage(message)
+    fun showErrorMessage(message: String) {
         Snackbar.make(activity_most_popular_movies_container, message, Snackbar.LENGTH_SHORT).show()
         swipeRefreshLayout.isRefreshing = false
     }

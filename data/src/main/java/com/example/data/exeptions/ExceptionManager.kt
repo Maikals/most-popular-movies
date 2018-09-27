@@ -18,6 +18,7 @@ object ExceptionManager {
             ExceptionType.CONNECTION_ERROR -> viewMessage = "CONNECTION ERROR"
             ExceptionType.UNDEFINED -> viewMessage = "UNDEFINED ERROR"
         }
+        //TODO THIS NEEDS TO USE A ACTIVITY TAG TO AVOID BEING CALLED IN THE BASE ACTIVITY WHEN IT HASN'T BEEN CALLED BY THE SAME ORIGINAL VIEW
         onErrorReceived(viewMessage)
     }
 }

@@ -27,4 +27,8 @@ class MostPopularMoviesActivity : BaseActivity(), MostPopularMoviesActivityFragm
 
     override fun getToolbar(): Toolbar = toolbar
 
+    override fun showErrorMessage(message: String) {
+        super.showErrorMessage(message)
+        (currentFragment as? MostPopularMoviesFragment)?.showErrorMessage(message)
+    }
 }

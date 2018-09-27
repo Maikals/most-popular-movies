@@ -1,4 +1,3 @@
-
 package com.example.miquelcastanys.cleanlearning.injector.component
 
 import com.example.miquelcastanys.cleanlearning.injector.module.*
@@ -12,6 +11,7 @@ import javax.inject.Singleton
 interface ApplicationComponent {
     fun inject(baseActivity: BaseActivity)
 
-    fun plus(baseFragmentModule: BaseFragmentModule, mostPopularMoviesModule: MostPopularMoviesModule) : MostPopularMoviesComponent
+    fun plus(baseFragmentModule: BaseFragmentModule, mostPopularMoviesModule: MostPopularMoviesModule): MostPopularMoviesComponent
 
+    fun plus(baseFragmentModule: BaseFragmentModule, newModule: MostPopularMoviesNewModule): MostPopularMoviesNewComponent
 }

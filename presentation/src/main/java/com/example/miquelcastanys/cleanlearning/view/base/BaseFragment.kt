@@ -14,18 +14,6 @@ abstract class BaseFragment : Fragment() {
         setupFragmentComponent()
     }
 
-    override fun onResume() {
-        super.onResume()
-        ExceptionManager.onErrorReceived = {
-            showErrorMessage(it)
-        }
-    }
-
-    @CallSuper
-    open fun showErrorMessage(message: String) {
-        Log.d("SHOW_ERROR", message)
-    }
-
     protected abstract fun setupFragmentComponent()
 
 }
