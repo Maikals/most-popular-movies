@@ -7,5 +7,5 @@ import com.example.domain.repository.ReachAbility
 
 class CheckInternetConnectionUseCase constructor(private val reachAbility: ReachAbility) :
         BaseCoRoutineUseCase<ReachAbilityEntity, ReachAbilityCallParams>() {
-    override fun buildRepoCall(params: ReachAbilityCallParams): ReachAbilityEntity = reachAbility.checkHost(params)
+    override suspend fun buildRepoCall(params: ReachAbilityCallParams): ReachAbilityEntity = reachAbility.checkHost(params)
 }

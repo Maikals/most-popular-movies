@@ -7,6 +7,7 @@ import com.example.data.repository.MostPopularMoviesRepositoryImpl
 import com.example.data.repository.dataSource.MostPopularDataStoreImpl
 import com.example.data.repository.dataSource.MostPopularMoviesStore
 import com.example.domain.repository.MostPopularMoviesRepository
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -41,6 +42,7 @@ class MovieApiModule {
         val builder = Retrofit.Builder()
                 .baseUrl(ApiConstants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(CoroutineCallAdapterFactory())
         return builder.client(httpClient.build()).build().create(MostPopularMoviesService::class.java)
     }
 }

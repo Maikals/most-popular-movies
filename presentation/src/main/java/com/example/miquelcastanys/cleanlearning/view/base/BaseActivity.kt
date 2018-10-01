@@ -5,7 +5,6 @@ import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import com.example.data.exeptions.ExceptionManager
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import kotlinx.android.synthetic.main.activity_base.*
@@ -30,22 +29,18 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        ReachAbilityManager.primaryHostListener ={
+        ReachAbilityManager.primaryHostListener = {
             onConnectivityChanges(it)
         }
 
         ReachAbilityManager.secondaryHostListener = {
             onConnectivityChanges(it)
         }
-
-        ExceptionManager.onErrorReceived = {
-            showErrorMessage(it)
-        }
     }
 
     @CallSuper
-    open fun showErrorMessage(message:String){
-        Log.d("BaseActivity",message)
+    open fun showErrorMessage(message: String) {
+        Log.d("BaseActivity", message)
     }
 
     @CallSuper

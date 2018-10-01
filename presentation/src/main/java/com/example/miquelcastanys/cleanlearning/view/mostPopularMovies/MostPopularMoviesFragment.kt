@@ -369,7 +369,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     fun showErrorMessage(message: String) {
         Snackbar.make(activity_most_popular_movies_container, message, Snackbar.LENGTH_SHORT).show()
-        swipeRefreshLayout.isRefreshing = false
+        swipeRefreshLayout?.isRefreshing = false
     }
 }
 

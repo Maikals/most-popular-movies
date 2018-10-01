@@ -7,18 +7,15 @@ import com.example.domain.exceptions.ExceptionType
 object ExceptionManager {
 
     private val TAG = "ExceptionManager"
-    lateinit var onErrorReceived: (String) -> Unit
 
-    fun manageError(exception: CustomException) {
-        var viewMessage = ""
+    fun manageError(exception: CustomException): String {
         Log.d(TAG, exception.message ?: "ERROR")
 
         //this has to retrieve the message from database
-        when (exception.exceptionType) {
-            ExceptionType.CONNECTION_ERROR -> viewMessage = "CONNECTION ERROR"
-            ExceptionType.UNDEFINED -> viewMessage = "UNDEFINED ERROR"
+        return when (exception.exceptionType) {
+            ExceptionType.CONNECTION_ERROR -> "CONNECTION ERROR"
+            ExceptionType.UNDEFINED -> "UNDEFINED ERROR"
+            else -> "UNDEFINED ERROR"
         }
-        //TODO THIS NEEDS TO USE A ACTIVITY TAG TO AVOID BEING CALLED IN THE BASE ACTIVITY WHEN IT HASN'T BEEN CALLED BY THE SAME ORIGINAL VIEW
-        onErrorReceived(viewMessage)
     }
 }

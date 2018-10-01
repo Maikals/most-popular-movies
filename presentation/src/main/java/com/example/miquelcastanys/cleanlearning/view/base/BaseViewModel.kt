@@ -9,14 +9,13 @@ import com.example.domain.exceptions.CustomException
 
 abstract class BaseViewModel : ViewModel() {
 
-    fun <T : BaseEntity, Params> execute(useCase: BaseCoRoutineUseCase<T, Params>, params: Params, onResultOk: (T) -> Unit, onResultError: () -> Unit) {
+    fun <T : BaseEntity, Params> execute(useCase: BaseCoRoutineUseCase<T, Params>, params: Params, onResultOk: (T) -> Unit, onResultError: (String) -> Unit) {
         useCase.execute(params, {
             if (it.result) onResultOk(it)
-            else onResultError()
+            else onResultError(ExceptionManager.manageError(CustomException()))
         }, {
             Log.e("BaseViewModel", "Error", it)
-            ExceptionManager.manageError(it ?: CustomException())
-            onResultError()
+            onResultError(ExceptionManager.manageError(it ?: CustomException()))
         })
     }
 }

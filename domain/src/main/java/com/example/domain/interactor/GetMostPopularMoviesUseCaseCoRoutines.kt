@@ -10,6 +10,6 @@ import javax.inject.Inject
 class GetMostPopularMoviesUseCaseCoRoutines @Inject constructor(private val mostPopularMoviesRepository: MostPopularMoviesRepository)
     : BaseCoRoutineUseCase<MovieListEntity, MostPopularMoviesParams>() {
 
-    override fun buildRepoCall(params: MostPopularMoviesParams): MovieListEntity =
+    override suspend fun buildRepoCall(params: MostPopularMoviesParams): MovieListEntity =
             mostPopularMoviesRepository.getMostPopularMovies(params.page)
 }

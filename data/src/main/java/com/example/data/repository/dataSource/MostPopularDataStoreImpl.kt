@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 
 class MostPopularDataStoreImpl @Inject constructor(private val mostPopularMoviesService: MostPopularMoviesService) : MostPopularMoviesStore {
-    override fun getMostPopularMoviesList(page: Int): MovieListEntity =
-            MovieListMapper.toDomainObject(mostPopularMoviesService.getMostPopularMoviesList(page).execute().body())
+    override suspend fun getMostPopularMoviesList(page: Int): MovieListEntity =
+            MovieListMapper.toDomainObject(mostPopularMoviesService.getMostPopularMoviesList(page).await())
 
 }
