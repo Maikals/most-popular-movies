@@ -1,3 +1,3 @@
 package com.example.domain.entity
 
-class ReachAbilityCallParams(val host: ArrayList<InternetAddress>)
+class ReachAbilityCallParams(val internetAddress: InternetAddress)

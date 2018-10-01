@@ -6,27 +6,51 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.NetworkInfo
 import android.net.wifi.WifiManager
+import com.example.data.reachability.ReachAbilityDevicesImpl
 import com.example.data.reachability.ReachAbilityImpl
 import com.example.domain.entity.InternetAddress
 import com.example.domain.entity.ReachAbilityCallParams
+import com.example.domain.entity.ReachAbilityDeviceCallParams
+import com.example.domain.interactor.CheckDevicesReachAbilityUseCase
 import com.example.domain.interactor.CheckInternetConnectionUseCase
 
 
 object ReachAbilityManager : BroadcastReceiver() {
 
-    private var useCase = CheckInternetConnectionUseCase(ReachAbilityImpl())
 
-    private var primaryAddress = InternetAddress("")
-    lateinit var primaryHostListener: (Boolean) -> Unit
+    private var useCaseBackEnd = CheckInternetConnectionUseCase(ReachAbilityImpl())
+    private var useCaseDevices = CheckDevicesReachAbilityUseCase(ReachAbilityDevicesImpl())
 
-    private var secondaryAddress = InternetAddress("")
-    lateinit var secondaryHostListener: (Boolean) -> Unit
-    var checkSecondaryHostEnabled = false
+    private var backOfficeAddress = InternetAddress("")
+    private lateinit var primaryHostListener: (Boolean) -> Unit
 
-    fun initializeParams(primaryHost: String, secondaryHost: String, primaryPort: Int = 443,
-                         secondaryPort: Int = 443) {
-        this.primaryAddress = InternetAddress(primaryHost, primaryPort)
-        this.secondaryAddress = InternetAddress(secondaryHost, secondaryPort)
+    fun setBackOfficeReachAbleListener(host: String, block: (Boolean) -> Unit) {
+        backOfficeAddress = InternetAddress(host)
+        primaryHostListener = block
+    }
+
+    //Most likely to be a VUE
+    private const val BROADCAST_PORT_VUE = 49153
+    private var firstDevice = InternetAddress("")
+    private lateinit var firstDeviceHostListener: (Boolean) -> Unit
+
+    var checkFirstDeviceEnabled = false
+
+    fun setFirstDeviceReachAbleListener(host: String, block: (Boolean) -> Unit) {
+        firstDevice = InternetAddress(host, BROADCAST_PORT_VUE)
+        firstDeviceHostListener = block
+    }
+
+    //Most lilkely to be a FUSE
+    private const val BROADCAST_PORT_FUSE = 8888
+    private var secondDevice = InternetAddress("")
+    private lateinit var secondDeviceHostListener: (Boolean) -> Unit
+
+    var checkSecondDeviceEnabled = false
+
+    fun setSecondDeviceReachAbleListener(host: String, block: (Boolean) -> Unit) {
+        secondDevice = InternetAddress(host, BROADCAST_PORT_FUSE)
+        secondDeviceHostListener = block
     }
 
 
@@ -41,26 +65,22 @@ object ReachAbilityManager : BroadcastReceiver() {
         if (extras != null) {
             val networkInfo = extras?.getParcelable<NetworkInfo>("networkInfo")
             if (networkInfo != null) {
+
+
                 when (networkInfo.detailedState) {
                     NetworkInfo.State.CONNECTED -> {
                         if (!isNetworkStateConnected) {
                             isNetworkStateConnected = true
-                            start()
+                            checkHostBackOffice()
+                            checkDevicesArray()
                         }
                     }
 
                     NetworkInfo.State.DISCONNECTED -> {
 
                         if (isNetworkStateConnected) {
-
-                            primaryAddress.isReachAble = false
-                            secondaryAddress.isReachAble = false
-
-                            primaryHostListener(false)
-
-                            if (checkSecondaryHostEnabled) {
-                                secondaryHostListener(false)
-                            }
+                            setNotReachAbleVariables()
+                            broadcastOffToListeners()
                         }
 
                         isNetworkStateConnected = false
@@ -70,24 +90,58 @@ object ReachAbilityManager : BroadcastReceiver() {
         }
     }
 
-    fun start() {
+    private fun setNotReachAbleVariables() {
+        backOfficeAddress.isReachAble = false
+        firstDevice.isReachAble = false
+        secondDevice.isReachAble = false
+    }
 
-        useCase.execute(ReachAbilityCallParams(buildArrayFromHosts()), {
-            it.host.forEach {
+    private fun broadcastOffToListeners() {
+
+        primaryHostListener(false)
+
+        if (checkFirstDeviceEnabled) {
+            firstDeviceHostListener(false)
+        }
+
+        if (checkSecondDeviceEnabled) {
+            secondDeviceHostListener(false)
+        }
+    }
+
+    private fun checkHostBackOffice() {
+
+        useCaseBackEnd.execute(ReachAbilityCallParams(InternetAddress(backOfficeAddress.host)), {
+
+            if (it.host.isReachAble != backOfficeAddress.isReachAble) {
+                backOfficeAddress.isReachAble = it.host.isReachAble
+                primaryHostListener(backOfficeAddress.isReachAble)
+            }
+
+        }, {
+            //do nothing
+        })
+    }
+
+
+    fun checkDevicesArray() {
+
+        useCaseDevices.execute(ReachAbilityDeviceCallParams(buildArrayFromHosts()), { entity ->
+            entity.internetAddressArray.forEach {
 
                 when (it.host) {
 
-                    primaryAddress.host -> {
-                        if (it.isReachAble != primaryAddress.isReachAble) {
-                            primaryAddress.isReachAble = it.isReachAble
-                            primaryHostListener(primaryAddress.isReachAble)
+                    firstDevice.host -> {
+                        if (it.isReachAble != firstDevice.isReachAble) {
+                            firstDevice.isReachAble = it.isReachAble
+                            firstDeviceHostListener(firstDevice.isReachAble)
                         }
                     }
 
-                    secondaryAddress.host -> {
-                        if (it.isReachAble != secondaryAddress.isReachAble) {
-                            secondaryAddress.isReachAble = it.isReachAble
-                            secondaryHostListener(secondaryAddress.isReachAble)
+                    secondDevice.host -> {
+                        if (it.isReachAble != secondDevice.isReachAble) {
+                            secondDevice.isReachAble = it.isReachAble
+                            secondDeviceHostListener(secondDevice.isReachAble)
                         }
                     }
                 }
@@ -95,17 +149,17 @@ object ReachAbilityManager : BroadcastReceiver() {
             }
 
         }, {
-
+            //do nothing
         })
     }
 
     private fun buildArrayFromHosts(): ArrayList<InternetAddress> {
         val arrayListHost: ArrayList<InternetAddress> = arrayListOf()
-        if (!primaryAddress.host.isEmpty()) {
-            arrayListHost.add(primaryAddress)
+        if (!firstDevice.host.isEmpty() && checkFirstDeviceEnabled) {
+            arrayListHost.add(firstDevice)
         }
-        if (!secondaryAddress.host.isEmpty() && checkSecondaryHostEnabled) {
-            arrayListHost.add(secondaryAddress)
+        if (!secondDevice.host.isEmpty() && checkSecondDeviceEnabled) {
+            arrayListHost.add(secondDevice)
         }
         return arrayListHost
     }

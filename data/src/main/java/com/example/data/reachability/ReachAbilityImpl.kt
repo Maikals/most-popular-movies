@@ -5,40 +5,23 @@ import com.example.domain.entity.ReachAbilityCallParams
 import com.example.domain.entity.ReachAbilityEntity
 import com.example.domain.repository.ReachAbility
 import java.io.IOException
-import java.net.InetSocketAddress
-import java.net.Socket
+import java.net.*
 
 class ReachAbilityImpl : ReachAbility {
 
-    private val TAG = "ReachAbilityImpl"
+    private val TAG = "ReachAbility"
 
-    override fun checkHost(host: ReachAbilityCallParams): ReachAbilityEntity {
+    override fun checkBackEndHost(params: ReachAbilityCallParams): ReachAbilityEntity {
+        //move to useCASE with a delay
+        Thread.sleep(1000)
+        params.internetAddress.isReachAble = isConnected(params.internetAddress)
 
-        val resultArray: ArrayList<InternetAddress> = arrayListOf()
-
-        host.host.forEach { it ->
-            val internetAddress = InternetAddress(it.host, it.port)
-
-            var retries = 5
-            var isReachAble = isConnected(internetAddress)
-
-            while (!isReachAble && retries > 0) {
-                Thread.sleep(2000)
-                isReachAble = isConnected(internetAddress)
-                retries--
-            }
-
-            internetAddress.isReachAble = isReachAble
-
-            resultArray.add(internetAddress)
-        }
-
-        return ReachAbilityEntity(resultArray, resultArray.size > 0)
+        return ReachAbilityEntity(params.internetAddress)
 
     }
 
-
-    fun isConnected(internetAddress: InternetAddress): Boolean {
+    //TODO REPLACE SOCKET WITH ADAPTER TO PERFORM PROPER HEALTH API CALL
+    private fun isConnected(internetAddress: InternetAddress): Boolean {
         val socket = Socket()
         var isConnected: Boolean
         try {
@@ -60,4 +43,6 @@ class ReachAbilityImpl : ReachAbility {
         return isConnected
 
     }
+
+
 }

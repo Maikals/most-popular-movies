@@ -25,10 +25,17 @@ class MostPopularMoviesActivity : BaseActivity(), MostPopularMoviesActivityFragm
         println("INTERNET STATE AFTER PING: $isConnected")
     }
 
+    override fun onConnectivityChangesVUE(isConnected: Boolean) {
+        super.onConnectivityChangesVUE(isConnected)
+        println("VUE STATE AFTER PING: $isConnected")
+    }
+
+    override fun onConnectivityChangesFUSE(isConnected: Boolean) {
+        super.onConnectivityChangesFUSE(isConnected)
+        println("FUSE STATE AFTER PING: $isConnected")
+    }
+
     override fun getToolbar(): Toolbar = toolbar
 
-    override fun showErrorMessage(message: String) {
-        super.showErrorMessage(message)
-        (currentFragment as? MostPopularMoviesFragment)?.showErrorMessage(message)
-    }
+
 }
