@@ -14,12 +14,9 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params> {
                 blockError: (CustomException?) -> Unit) {
         job = launchAsync {
             async({
-                val buildRepoCall = buildRepoCall(params)
-                launchAsync {
-                    block(buildRepoCall)
-                }
+                block(buildRepoCall(params))
             }, {
-                launchAsync { blockError(it) }
+                blockError(it)
             })
         }
     }
@@ -28,15 +25,17 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params> {
 
     fun launchAsync(block: suspend CoroutineScope.() -> Unit): Job =
             GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, {
-                println("BaseCoRoutineUseCase: $it")
+                if (it != null) println("BaseCoRoutineUseCase: $it")
             }, {
                 block()
             })
 
     suspend fun <T> async(block: suspend CoroutineScope.() -> T, blockError: (CustomException?) -> T): Deferred<T> {
         return GlobalScope.async(Dispatchers.Default, CoroutineStart.DEFAULT, {
-            println("BaseCoRoutineUseCase: $it")
-            if (it != null) blockError(CustomException(it, ExceptionType.UNDEFINED))
+            if (it != null) {
+                println("BaseCoRoutineUseCase: $it")
+                blockError(CustomException(it, ExceptionType.UNDEFINED))
+            }
         }, {
             block()
         })
