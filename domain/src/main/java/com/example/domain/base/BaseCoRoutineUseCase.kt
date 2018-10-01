@@ -47,7 +47,7 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params> {
 
     fun cancel() {
         GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, {
-            println("BaseCoRoutineUseCase: $it")
+            if (it != null) println("BaseCoRoutineUseCase: $it")
         }, {
             job?.cancelAndJoin()
         })
