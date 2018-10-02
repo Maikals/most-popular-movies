@@ -1,7 +1,6 @@
 package com.example.data.repository.dataSource
 
 import com.example.data.db.RealmHelper
-import com.example.data.entity.MovieListDTO
 import com.example.data.entity.mapper.MovieListMapper
 import com.example.data.net.MostPopularMoviesService
 import com.example.domain.entity.MovieEntity
@@ -17,7 +16,7 @@ class MostPopularDataStoreImpl @Inject constructor(private val mostPopularMovies
     override fun setMostPopularMoviesLocal(moviesList: List<MovieEntity>) =
             realmHelper.setMostPopularList(moviesList)
 
-    override fun getMostPopularMoviesLocal(): MovieListEntity =
-            MovieListEntity(-1, -1, realmHelper.getMostPopularList())
+    override suspend fun getMostPopularMoviesLocal(): MovieListEntity =
+            MovieListEntity(-1, -1, realmHelper.getMostPopularList().await())
 
 }

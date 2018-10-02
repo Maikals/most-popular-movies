@@ -4,16 +4,17 @@ import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import com.example.data.exeptions.ExceptionManager
+import android.support.v7.widget.Toolbar
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import kotlinx.android.synthetic.main.activity_base.*
 
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface {
     protected var currentTag: String? = null
     protected var currentFragment: Fragment? = null
+    protected var isConnected: Boolean = true
 
+    override fun isInternetReachable(): Boolean = isConnected
 
     companion object {
         private const val CURRENT_FRAGMENT_TAG: String = "currentTag"
@@ -50,6 +51,7 @@ abstract class BaseActivity : AppCompatActivity() {
     @CallSuper
     open fun onConnectivityChanges(isConnected: Boolean) {
         //set a general param.
+        this.isConnected = isConnected
     }
 
     @CallSuper
@@ -93,5 +95,9 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected fun setToolbarTitle(title: String) {
         supportActionBar?.title = title
+    }
+
+    override fun getToolbar(): Toolbar {
+        return toolbar
     }
 }

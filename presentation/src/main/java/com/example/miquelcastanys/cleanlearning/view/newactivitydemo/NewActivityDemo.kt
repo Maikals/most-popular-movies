@@ -6,6 +6,8 @@ import com.example.miquelcastanys.cleanlearning.view.base.BaseActivity
 import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui.newactivitydemo.NewActivityDemoFragment
 
 class NewActivityDemo : BaseActivity() {
+
+
     override fun createFragmentAndSettingTAG() {
         currentFragment = NewActivityDemoFragment.newInstance()
         currentTag = NewActivityDemoFragment.TAG
