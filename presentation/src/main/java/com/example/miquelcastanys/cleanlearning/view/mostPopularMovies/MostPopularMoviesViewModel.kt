@@ -4,13 +4,14 @@ import android.arch.lifecycle.MutableLiveData
 import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoRoutines
+import com.example.domain.interactor.GetSavedMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
 import com.example.miquelcastanys.cleanlearning.view.base.BaseViewModel
 
 
-class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCaseCoRoutines) : BaseViewModel() {
+class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCaseCoRoutines, private val localUseCase: GetSavedMoviesUseCase) : BaseViewModel() {
 
     var currentPage = 1
     val mostPopularMovies = MutableLiveData<ArrayList<BaseListViewEntity>>().apply {
@@ -34,6 +35,18 @@ class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCas
                 loading = false
             })
         }
+    }
+
+    fun getSavedMovies() {
+        execute(localUseCase, null,
+                {
+                    if (it.result)
+                        manageMovieListEntityReceived(true, it)
+                    onDataReceived.postValue(it.result)
+                },
+                {
+                    onDataReceived.postValue(false)
+                })
     }
 
     private fun manageMovieListEntityReceived(refreshList: Boolean, moviesListEntity: MovieListEntity) {

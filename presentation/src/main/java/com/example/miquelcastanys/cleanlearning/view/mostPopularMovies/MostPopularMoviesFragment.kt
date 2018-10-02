@@ -63,7 +63,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-            if (dy > 0) {
+            if (dy > 0 && isInternetReachable()) {
                 val visibleItemCount = linearLayoutManager.childCount
                 val totalItemCount = linearLayoutManager.itemCount
                 val pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition()
@@ -79,6 +79,9 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         }
     }
 
+    private fun isInternetReachable() =
+            mostPopularMoviesActivityFragmentInterface?.isInternetReachable() ?: false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.fragment_most_popular_movies, container, false)
 
@@ -88,7 +91,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         setEmptyView()
         setHasOptionsMenu(true)
         createViewModel()
-        viewModel.getMostPopularMovies()
+        getData()
 
         if (mostPopularMoviesRV.adapter == null)
             mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(viewModel.mostPopularMovies.value as List<BaseListViewEntity>)
@@ -202,8 +205,14 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 if (!presenter.isSearching) {
                     restartListAnimation()
                 }
-                viewModel.getMostPopularMovies(true)
+                getData()
             }
+
+    private fun getData() {
+        if (isInternetReachable())
+            viewModel.getMostPopularMovies(true)
+        else viewModel.getSavedMovies()
+    }
 
     override fun restartListAnimation() {
         (mostPopularMoviesRV?.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()

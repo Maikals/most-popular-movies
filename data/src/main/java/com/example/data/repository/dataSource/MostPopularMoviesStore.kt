@@ -6,6 +6,6 @@ import com.example.domain.entity.MovieListEntity
 
 interface MostPopularMoviesStore {
     suspend fun getMostPopularMoviesList(page: Int): MovieListEntity
-    fun getMostPopularMoviesLocal(): MovieListEntity
+    suspend fun getMostPopularMoviesLocal(): MovieListEntity
     fun setMostPopularMoviesLocal(moviesList: List<MovieEntity>)
 }
