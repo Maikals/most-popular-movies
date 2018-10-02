@@ -25,7 +25,7 @@ class ReachAbilityDevicesImpl : ReachAbilityDevices {
     }
 
 
-    private val SEND_DATA = "lalala".toByteArray()
+    private val SEND_DATA = "FUSE".toByteArray()
 
     private fun checkDeviceReachAbleViaUDP(internetAddress: InternetAddress) {
 

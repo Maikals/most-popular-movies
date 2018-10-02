@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.NetworkInfo
 import android.net.wifi.WifiManager
+import android.os.CountDownTimer
 import com.example.data.reachability.ReachAbilityDevicesImpl
 import com.example.data.reachability.ReachAbilityImpl
 import com.example.domain.entity.InternetAddress
@@ -72,7 +73,7 @@ object ReachAbilityManager : BroadcastReceiver() {
                         if (!isNetworkStateConnected) {
                             isNetworkStateConnected = true
                             checkHostBackOffice()
-                            checkDevicesArray()
+                            //checkDevicesArray()
                         }
                     }
 
@@ -164,5 +165,17 @@ object ReachAbilityManager : BroadcastReceiver() {
         return arrayListHost
     }
 
+    fun launchVUEListener() {
+        val period = Long.MAX_VALUE
+        val countDownInterval = 60000L
+
+        object : CountDownTimer(period, countDownInterval) {
+            override fun onTick(millisUntilFinished: Long) {
+                checkDevicesArray()
+            }
+
+            override fun onFinish() = Unit
+        }.start()
+    }
 
 }

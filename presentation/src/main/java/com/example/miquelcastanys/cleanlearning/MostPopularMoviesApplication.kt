@@ -23,5 +23,8 @@ class MostPopularMoviesApplication : Application() {
         ReachAbilityManager.registerReceiver(this)
         ReachAbilityManager.checkFirstDeviceEnabled = true
         ReachAbilityManager.checkSecondDeviceEnabled = true
+
+        ReachAbilityManager.launchVUEListener()
+
     }
 }
