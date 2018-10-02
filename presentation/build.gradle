@@ -45,7 +45,6 @@ dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //Android basic dependencies
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.22.5"
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'

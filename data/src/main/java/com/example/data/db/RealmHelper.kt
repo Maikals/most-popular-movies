@@ -1,9 +1,11 @@
 package com.example.data.db
 
 import android.content.Context
+import com.example.data.entity.GenreRealmEntity
 import com.example.data.entity.MovieRealmEntity
 import com.example.domain.entity.MovieEntity
 import io.realm.Realm
+import io.realm.RealmConfiguration
 import io.realm.RealmList
 import kotlinx.coroutines.experimental.CompletableDeferred
 import javax.inject.Inject
@@ -14,39 +16,90 @@ class RealmHelper @Inject constructor(context: Context) {
 
 
     init {
-//        Realm.setDefaultConfiguration(RealmConfiguration.Builder().encryptionKey(byteArrayOf()).build())
         Realm.init(context)
+        Realm.setDefaultConfiguration(RealmConfiguration.Builder()
+                .name("moviesRealmDatabase")
+                .schemaVersion(2)
+//                .encryptionKey(byteArrayOf())
+                .build())
     }
 
 
-    fun getMostPopularList(): CompletableDeferred<List<MovieEntity>> =
-            CompletableDeferred(Realm.getDefaultInstance().where(MovieRealmEntity::class.java).findAll().map {
-                MovieEntity(it.id!!, it.video!!, it.voteAverage!!, it.title!!, it.popularity!!, it.posterPath!!, it.genreIds!!, it.backdropPath!!, it.adult!!, it.overview!!, it.releaseDate!!)
-            })
+    fun getMostPopularList(): CompletableDeferred<List<MovieEntity>> {
+        val realmInstance = getRealmInstance()
+        val completableDeferred = CompletableDeferred(realmInstance.where(MovieRealmEntity::class.java).findAll().map {
+            MovieEntity(it.id!!,
+                    it.video!!,
+                    it.voteAverage!!,
+                    it.title!!,
+                    it.popularity!!,
+                    it.posterPath!!,
+                    it.genreIds?.map { it.id!! } ?: listOf(),
+                    it.backdropPath!!,
+                    it.adult!!,
+                    it.overview!!,
+                    it.releaseDate!!)
+        })
+        realmInstance.close()
+        return completableDeferred
+    }
 
-
-    fun setMostPopularList(moviesList: List<MovieEntity>) {
-
-        Realm.getDefaultInstance().executeTransaction { realm ->
-            moviesList.forEach {
-                if (realm.where(MovieRealmEntity::class.java).equalTo("id", it.id).findAll().size == 0) {
-                    val movie = MovieRealmEntity()
-                    movie.id = it.id
-                    movie.video = it.video
-                    movie.voteAverage = it.voteAverage
-                    movie.title = it.title
-                    movie.popularity = it.popularity
-                    movie.posterPath = it.posterPath
-                    movie.genreIds = RealmList<Int>().apply {
-                        it.genreIds.forEach { genreId -> add(genreId) }
-                    }
-                    movie.backdropPath = it.backdropPath
-                    movie.adult = it.adult
-                    movie.overview = it.overview
-                    movie.releaseDate = it.releaseDate
-                    Realm.getDefaultInstance().copyToRealm(movie)
+    fun setMostPopularList(moviesList: List<MovieEntity>) =
+            executeTransaction { realm ->
+                moviesList.forEach {
+                    if (!movieExists(it))
+                        realm.copyToRealmOrUpdate(createMovieRealmEntityFromMovieEntity(it))
                 }
             }
-        }
+
+    private fun createMovieRealmEntityFromMovieEntity(movie: MovieEntity): MovieRealmEntity =
+            MovieRealmEntity().apply {
+                id = movie.id
+                video = movie.video
+                voteAverage = movie.voteAverage
+                title = movie.title
+                popularity = movie.popularity
+                posterPath = movie.posterPath
+                backdropPath = movie.backdropPath
+                adult = movie.adult
+                overview = movie.overview
+                releaseDate = movie.releaseDate
+                genreIds = RealmList<GenreRealmEntity>().also { genreRealmList ->
+                    movie.genreIds.forEach { genreId -> genreRealmList.add(generateGenreRealmEntity(genreId, this)) }
+                }
+            }
+
+    private fun generateGenreRealmEntity(genreId: Int, movieRealmEntity: MovieRealmEntity): GenreRealmEntity? =
+            if (genreExists(genreId)) getGenreEntityByID(genreId).apply { movie?.add(movieRealmEntity) }
+            else GenreRealmEntity().apply {
+                id = genreId
+                movie = RealmList<MovieRealmEntity>().apply {
+                    add(movieRealmEntity)
+                }
+            }
+
+    fun movieExists(movie: MovieEntity): Boolean {
+        val realmInstance = getRealmInstance()
+        val b = realmInstance.where(MovieRealmEntity::class.java).equalTo("id", movie.id).findAll().size > 0
+        realmInstance.close()
+        return b
     }
+
+    fun getGenreEntityByID(genreId: Int): GenreRealmEntity {
+        val realmInstance = getRealmInstance()
+        val findFirst = realmInstance.where(GenreRealmEntity::class.java).equalTo("id", genreId).findFirst()!!
+        realmInstance.close()
+        return findFirst
+    }
+
+    private fun genreExists(genreId: Int) =
+            getRealmInstance().where(GenreRealmEntity::class.java).equalTo("id", genreId).findAll().size > 0
+
+    private fun executeTransaction(fn: (Realm) -> Unit) {
+        val realmInstance = getRealmInstance()
+        realmInstance.executeTransaction { fn(it) }
+        realmInstance.close()
+    }
+
+    private fun getRealmInstance() = Realm.getDefaultInstance()
 }
