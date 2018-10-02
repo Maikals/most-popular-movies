@@ -1,13 +1,15 @@
 package com.example.miquelcastanys.cleanlearning
 
-import android.app.Application
+import android.content.Context
+import android.support.multidex.MultiDex
+import android.support.multidex.MultiDexApplication
 import com.example.miquelcastanys.cleanlearning.injector.component.ApplicationComponent
 import com.example.miquelcastanys.cleanlearning.injector.component.DaggerApplicationComponent
 import com.example.miquelcastanys.cleanlearning.injector.module.ApplicationModule
 import com.example.miquelcastanys.cleanlearning.view.base.ReachAbilityManager
 
 
-class MostPopularMoviesApplication : Application() {
+class MostPopularMoviesApplication : MultiDexApplication() {
 
     companion object {
         lateinit var instance: MostPopularMoviesApplication
@@ -26,5 +28,10 @@ class MostPopularMoviesApplication : Application() {
 
         ReachAbilityManager.launchVUEListener()
 
+    }
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+        MultiDex.install(this)
     }
 }

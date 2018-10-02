@@ -10,7 +10,9 @@ import javax.inject.Inject
 class MostPopularMoviesRepositoryImpl @Inject constructor(private val mostPopularMoviesStore: MostPopularMoviesStore) : MostPopularMoviesRepository {
     override suspend fun getMostPopularMovies(page: Int): MovieListEntity {
         delay(10000)
-        return mostPopularMoviesStore.getMostPopularMoviesList(page)
+        val mostPopularMoviesList = mostPopularMoviesStore.getMostPopularMoviesList(page)
+        mostPopularMoviesStore.setMostPopularMoviesLocal(mostPopularMoviesList.moviesList)
+        return mostPopularMoviesList
     }
 
 }
