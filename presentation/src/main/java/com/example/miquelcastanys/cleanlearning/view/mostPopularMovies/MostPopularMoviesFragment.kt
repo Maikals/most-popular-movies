@@ -62,7 +62,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
             false)
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             if (dy > 0 && isInternetReachable()) {
                 val visibleItemCount = linearLayoutManager.childCount
                 val totalItemCount = linearLayoutManager.itemCount
@@ -72,7 +72,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                         viewModel.getMostPopularMovies()
                     }
                 }
-            } else if (linearLayoutManager.findLastVisibleItemPosition() == mostPopularMoviesRV.adapter.itemCount - 1
+            } else if (linearLayoutManager.findLastVisibleItemPosition() == mostPopularMoviesRV.adapter?.itemCount!! - 1
                     && !presenter.isLastPage) {
                 viewModel.getMostPopularMovies()
             }
@@ -101,7 +101,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 if (it) {
                     showProgressBar(false)
                     showRecyclerView()
-                    mostPopularMoviesRV.adapter.notifyDataSetChanged()
+                    mostPopularMoviesRV.adapter!!.notifyDataSetChanged()
                 } else {
                     showProgressBar(false)
                 }

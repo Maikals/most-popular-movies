@@ -18,8 +18,8 @@ class RealmHelper @Inject constructor(context: Context) {
     init {
         Realm.init(context)
         Realm.setDefaultConfiguration(RealmConfiguration.Builder()
-                .name("moviesRealmDatabase")
-                .schemaVersion(2)
+                .name("moviesRealmDatabase.realm")
+                .schemaVersion(3)
 //                .encryptionKey(byteArrayOf())
                 .build())
     }
@@ -65,22 +65,21 @@ class RealmHelper @Inject constructor(context: Context) {
                 overview = movie.overview
                 releaseDate = movie.releaseDate
                 genreIds = RealmList<GenreRealmEntity>().also { genreRealmList ->
-                    movie.genreIds.forEach { genreId -> genreRealmList.add(generateGenreRealmEntity(genreId, this)) }
+                    movie.genreIds.forEach { genreId -> genreRealmList.add(generateGenreRealmEntity(genreId)) }
                 }
             }
 
-    private fun generateGenreRealmEntity(genreId: Int, movieRealmEntity: MovieRealmEntity): GenreRealmEntity? =
-            if (genreExists(genreId)) getGenreEntityByID(genreId).apply { movie?.add(movieRealmEntity) }
+    private fun generateGenreRealmEntity(genreId: Int): GenreRealmEntity? =
+            if (genreExists(genreId)) getGenreEntityByID(genreId)
             else GenreRealmEntity().apply {
                 id = genreId
-                movie = RealmList<MovieRealmEntity>().apply {
-                    add(movieRealmEntity)
-                }
             }
 
     fun movieExists(movie: MovieEntity): Boolean {
         val realmInstance = getRealmInstance()
-        val b = realmInstance.where(MovieRealmEntity::class.java).equalTo("id", movie.id).findAll().size > 0
+
+        realmInstance.where(GenreRealmEntity::class.java).notEqualTo("movie.id", 0.toInt())
+        val b = realmInstance.where(MovieRealmEntity::class.java).equalTo("id", movie.id).findFirst() != null
         realmInstance.close()
         return b
     }
@@ -92,8 +91,8 @@ class RealmHelper @Inject constructor(context: Context) {
         return findFirst
     }
 
-    private fun genreExists(genreId: Int) =
-            getRealmInstance().where(GenreRealmEntity::class.java).equalTo("id", genreId).findAll().size > 0
+    private fun genreExists(genreId: Int): Boolean =
+            getRealmInstance().where(GenreRealmEntity::class.java).equalTo("id", genreId).findFirst() != null
 
     private fun executeTransaction(fn: (Realm) -> Unit) {
         val realmInstance = getRealmInstance()

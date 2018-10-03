@@ -74,18 +74,18 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface
             createFragmentAndSettingTAG()
         } else {
             currentTag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)
-            currentFragment = supportFragmentManager.getFragment(savedInstanceState, currentTag)
+            currentFragment = supportFragmentManager.getFragment(savedInstanceState, currentTag!!)
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
-        supportFragmentManager.putFragment(outState, currentTag, currentFragment)
-        outState?.putString(CURRENT_FRAGMENT_TAG, currentTag)
+        supportFragmentManager.putFragment(outState!!, currentTag!!, currentFragment!!)
+        outState.putString(CURRENT_FRAGMENT_TAG, currentTag)
         super.onSaveInstanceState(outState)
     }
 
     private fun beginTransaction() =
-            supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer, currentFragment, currentTag).commit()
+            supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer, currentFragment!!, currentTag).commit()
 
     abstract fun createFragmentAndSettingTAG()
 
