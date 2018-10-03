@@ -115,13 +115,13 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
         val extras = intent?.extras
         val networkInfo = extras?.getParcelable<NetworkInfo>("networkInfo")
 
-        if (networkInfo?.detailedState == NetworkInfo.State.CONNECTED) {
+        if (networkInfo?.detailedState == NetworkInfo.DetailedState.CONNECTED) {
             if (!isNetworkStateConnected) {
                 isNetworkStateConnected = true
                 checkBackOfficeReachAbility()
                 checkReachAbilityFUSE()
             }
-        } else if (networkInfo?.detailedState == NetworkInfo.State.DISCONNECTED) {
+        } else if (networkInfo?.detailedState == NetworkInfo.DetailedState.DISCONNECTED) {
             if (isNetworkStateConnected) {
                 setNotReachAbleVariables()
                 broadcastOffToListeners()
