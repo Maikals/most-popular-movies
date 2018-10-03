@@ -7,9 +7,13 @@ import com.example.miquelcastanys.cleanlearning.injector.component.ApplicationCo
 import com.example.miquelcastanys.cleanlearning.injector.component.DaggerApplicationComponent
 import com.example.miquelcastanys.cleanlearning.injector.module.ApplicationModule
 import com.example.miquelcastanys.cleanlearning.view.base.ReachAbilityManager
+import javax.inject.Inject
 
 
 class MostPopularMoviesApplication : MultiDexApplication() {
+
+    @Inject
+    lateinit var reachAbilityManager: ReachAbilityManager
 
     companion object {
         lateinit var instance: MostPopularMoviesApplication
@@ -21,13 +25,15 @@ class MostPopularMoviesApplication : MultiDexApplication() {
         super.onCreate()
         instance = this
         applicationComponent = DaggerApplicationComponent.builder().applicationModule(ApplicationModule(this)).build()
+        applicationComponent.inject(this)
 
-        ReachAbilityManager.registerReceiver(this)
-        ReachAbilityManager.checkFirstDeviceEnabled = true
-        ReachAbilityManager.checkSecondDeviceEnabled = true
+        reachAbilityManager.registerReceiver(this)
 
-        ReachAbilityManager.launchVUEListener()
-
+        reachAbilityManager.vueHost= ("192.168.1.20")
+        reachAbilityManager.fuseHost =("192.168.1.151")
+        reachAbilityManager.checkVueReachAbleEnabled = true
+        reachAbilityManager.checkFuseReachAbleEnabled = false
+        reachAbilityManager.startTimerVUE()
     }
 
     override fun attachBaseContext(base: Context) {

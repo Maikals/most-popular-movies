@@ -6,10 +6,10 @@ import com.example.domain.exceptions.ExceptionType
 
 object ExceptionManager {
 
-    private val TAG = "ExceptionManager"
+    private const val TAG = "ExceptionManager"
 
     fun manageError(exception: CustomException): String {
-        Log.d(TAG, exception.message ?: "ERROR")
+        Log.d(TAG, exception.message, exception)
 
         //this has to retrieve the message from database
         return when (exception.exceptionType) {

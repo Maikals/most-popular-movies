@@ -1,70 +1,56 @@
 package com.example.data.reachability
 
-import com.example.domain.entity.InternetAddress
-import com.example.domain.entity.ReachAbilityDeviceCallParams
-import com.example.domain.entity.ReachAbilityDeviceEntity
+import com.example.domain.base.Log
+import com.example.domain.entity.InternetAddressParams
+import com.example.domain.entity.ReachAbilityEntity
 import com.example.domain.repository.ReachAbilityDevices
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
+import javax.inject.Inject
 
-class ReachAbilityDevicesImpl : ReachAbilityDevices {
+class ReachAbilityDevicesImpl @Inject constructor() : ReachAbilityDevices {
 
-    override fun checkDevices(params: ReachAbilityDeviceCallParams): ReachAbilityDeviceEntity {
-
-        val resultArray: ArrayList<InternetAddress> = arrayListOf()
-
-        params.hosts.forEach { it ->
-            val internetAddress = InternetAddress(it.host, it.port)
-            checkDeviceReachAbleViaUDP(internetAddress)
-            resultArray.add(internetAddress)
-        }
-
-        return ReachAbilityDeviceEntity(resultArray, resultArray.size > 0)
-
+    companion object {
+        private const val TAG = "ReachAbilityDevicesImpl"
     }
 
+    override fun checkDevices(internetAddressParams: InternetAddressParams): ReachAbilityEntity = ReachAbilityEntity(checkDeviceReachAbleViaUDP(internetAddressParams))
 
+    //VUE does not care about the message, but FUSE needs this exact message, so its "FUSE" and works with both devices.
     private val SEND_DATA = "FUSE".toByteArray()
 
-    private fun checkDeviceReachAbleViaUDP(internetAddress: InternetAddress) {
+    private fun checkDeviceReachAbleViaUDP(internetAddressParams: InternetAddressParams): Boolean {
 
-        var isReachAble = false
+        var isReachAble: Boolean
         val datagramSocket = DatagramSocket()
 
         try {
+            datagramSocket.soTimeout = 3000
 
-            datagramSocket.soTimeout = 5000
-
-            val socketAddress = InetAddress.getByName(internetAddress.host)
-            val sendPacket = DatagramPacket(SEND_DATA, SEND_DATA.size, socketAddress, internetAddress.port)
+            val socketAddress = InetAddress.getByName(internetAddressParams.host)
+            val sendPacket = DatagramPacket(SEND_DATA, SEND_DATA.size, socketAddress, internetAddressParams.port)
             datagramSocket.send(sendPacket)
 
             val buf = ByteArray(15000)
 
             val receivePacket = DatagramPacket(buf, buf.size)
+            Log.d(TAG,"ReachAbilityDevices: Sending request packet to:  ${socketAddress.hostAddress};")
             datagramSocket.receive(receivePacket)
-
-            println("ReachAbilityDevices: Request packet sent to:  ${socketAddress.hostAddress} ;")
 
             isReachAble = !receivePacket.data.isEmpty()
 
             if (isReachAble) {
-                println("ReachAbilityDevices: UDP ESTABLISHED: ${internetAddress.host}")
+                Log.d(TAG,"UDP ESTABLISHED: ${internetAddressParams.host}")
             }
 
         } catch (e: Exception) {
             isReachAble = false
-            println("ReachAbilityDevices: UDP ERROR $e")
+            Log.e(TAG,"UDP Message at ip ${internetAddressParams.host} is not responding. \nError: $e")
         } finally {
             datagramSocket.close()
-            if (!isReachAble) {
-                println("ReachAbilityDevices: UDP Message ip not responding: ${internetAddress.host} ")
-            }
         }
-
-
-        internetAddress.isReachAble = isReachAble
-
+        return isReachAble
     }
+
 }

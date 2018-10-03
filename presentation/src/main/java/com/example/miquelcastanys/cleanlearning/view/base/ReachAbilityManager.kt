@@ -7,68 +7,97 @@ import android.content.IntentFilter
 import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.CountDownTimer
-import com.example.data.reachability.ReachAbilityDevicesImpl
-import com.example.data.reachability.ReachAbilityImpl
-import com.example.domain.entity.InternetAddress
-import com.example.domain.entity.ReachAbilityCallParams
-import com.example.domain.entity.ReachAbilityDeviceCallParams
+import com.example.domain.base.Log
+import com.example.domain.entity.EmptyParams
+import com.example.domain.entity.InternetAddressParams
 import com.example.domain.interactor.CheckDevicesReachAbilityUseCase
 import com.example.domain.interactor.CheckInternetConnectionUseCase
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
+class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckInternetConnectionUseCase,
+                                              private val useCaseDevice: CheckDevicesReachAbilityUseCase) : BroadcastReceiver() {
 
-object ReachAbilityManager : BroadcastReceiver() {
+    private val timer: CountDownTimer
 
-    /**UseCases*/
-    private var useCaseBackEnd = CheckInternetConnectionUseCase(ReachAbilityImpl())
-    private var useCaseDevices = CheckDevicesReachAbilityUseCase(ReachAbilityDevicesImpl())
+    companion object {
+        private const val PERIOD = Long.MAX_VALUE
+        private const val COUNT_DOWN_TIMER = 2000L
+        private const val TAG: String = "ReachAbilityManager"
+    }
+
+    init {
+
+        /**
+         * This logic is pending to be approved and tested.
+         * It checks the devices reach ability every 2 seconds
+         * */
+        timer = object : CountDownTimer(PERIOD, COUNT_DOWN_TIMER) {
+            override fun onTick(millisUntilFinished: Long) {
+                if (checkVueReachAbleEnabled) {
+                    checkReachAbilityVUE()
+                }
+            }
+
+            override fun onFinish() = Unit
+        }
+    }
 
     /**BackOffice Address with its listener and its block setter*/
-    private var backOfficeAddress = InternetAddress("")
-    private lateinit var primaryHostListener: (Boolean) -> Unit
+    private var isBackOfficeReachable: Boolean = false
+    private lateinit var backOfficeReachabilityListener: (Boolean) -> Unit
 
     /**
      * @param host the url to check or evaluate the back office reach ability
      * @param block function to set and later on answer the state changes
      * */
-    fun setBackOfficeReachAbleListener(host: String, block: (Boolean) -> Unit) {
-        backOfficeAddress = InternetAddress(host)
-        primaryHostListener = block
+    fun setBackOfficeReachAbleListener(block: (Boolean) -> Unit) {
+        backOfficeReachabilityListener = block
     }
 
     /**First device UDP logic Address with its listener and its block setter
      * VUE
      * */
-    private const val BROADCAST_PORT_VUE = 49153
-    private var firstDevice = InternetAddress("")
-    private lateinit var firstDeviceHostListener: (Boolean) -> Unit
-    var checkFirstDeviceEnabled = false //boolean to enable disable checking the host
+    private val BROADCAST_PORT_VUE = 49153
+    var vueHost = ""
+        set(value) {
+            field = value
+            vueDevice.host = value
+        }
+
+    private var vueDevice = InternetAddressParams(vueHost, BROADCAST_PORT_VUE)
+    private lateinit var vueReachabilityListener: (Boolean) -> Unit
+    var checkVueReachAbleEnabled = false //boolean to enable disable checking the host
 
     /**
      * @param host the url to check or evaluate the VUE reach ability
      * @param block function to set and later on answer the state changes
      * */
-    fun setFirstDeviceReachAbleListener(host: String, block: (Boolean) -> Unit) {
-        firstDevice = InternetAddress(host, BROADCAST_PORT_VUE)
-        firstDeviceHostListener = block
+    fun setReachAbleListenerVUE(block: (Boolean) -> Unit) {
+        vueReachabilityListener = block
     }
 
     /**Second device UDP logic Address with its listener and its block setter
      * FUSE
      * */
-    private const val BROADCAST_PORT_FUSE = 8888
-    private var secondDevice = InternetAddress("")
-    private lateinit var secondDeviceHostListener: (Boolean) -> Unit
-    var checkSecondDeviceEnabled = false//boolean to enable disable checking the host
+    private val BROADCAST_PORT_FUSE = 8888
+    var fuseHost = ""
+        set(value) {
+            field = value
+            fuseDevice.host = value
+        }
+    private var fuseDevice = InternetAddressParams("", BROADCAST_PORT_FUSE)
+    private lateinit var fuseReachabilityListener: (Boolean) -> Unit
+    var checkFuseReachAbleEnabled = false//boolean to enable disable checking the host
 
     /**
      * @param host the url to check or evaluate the FUSE reach ability
      * @param block function to set and later on answer the state changes
      * */
-    fun setSecondDeviceReachAbleListener(host: String, block: (Boolean) -> Unit) {
-        secondDevice = InternetAddress(host, BROADCAST_PORT_FUSE)
-        secondDeviceHostListener = block
+    fun setReachAbleListenerFUSE(block: (Boolean) -> Unit) {
+        fuseReachabilityListener = block
     }
-
 
     /**
      * @param context general Context to register the receiver
@@ -84,50 +113,39 @@ object ReachAbilityManager : BroadcastReceiver() {
     /**@Override method to receive connectivity changes from system Broadcast */
     override fun onReceive(context: Context?, intent: Intent?) {
         val extras = intent?.extras
-        if (extras != null) {
-            val networkInfo = extras?.getParcelable<NetworkInfo>("networkInfo")
-            if (networkInfo != null) {
+        val networkInfo = extras?.getParcelable<NetworkInfo>("networkInfo")
 
-
-                when (networkInfo.detailedState) {
-                    NetworkInfo.State.CONNECTED -> {
-                        if (!isNetworkStateConnected) {
-                            isNetworkStateConnected = true
-                            checkHostBackOffice()
-                            //checkDevicesArray() //possible call instead of the tick every X seconds.
-                        }
-                    }
-
-                    NetworkInfo.State.DISCONNECTED -> {
-
-                        if (isNetworkStateConnected) {
-                            setNotReachAbleVariables()
-                            broadcastOffToListeners()
-                        }
-
-                        isNetworkStateConnected = false
-                    }
-                }
+        if (networkInfo?.detailedState == NetworkInfo.State.CONNECTED) {
+            if (!isNetworkStateConnected) {
+                isNetworkStateConnected = true
+                checkBackOfficeReachAbility()
+                checkReachAbilityFUSE()
             }
+        } else if (networkInfo?.detailedState == NetworkInfo.State.DISCONNECTED) {
+            if (isNetworkStateConnected) {
+                setNotReachAbleVariables()
+                broadcastOffToListeners()
+            }
+            isNetworkStateConnected = false
         }
     }
 
     private fun setNotReachAbleVariables() {
-        backOfficeAddress.isReachAble = false
-        firstDevice.isReachAble = false
-        secondDevice.isReachAble = false
+        isBackOfficeReachable = false
+        vueDevice.isReachAble = false
+        fuseDevice.isReachAble = false
     }
 
     private fun broadcastOffToListeners() {
 
-        primaryHostListener(false)
+        backOfficeReachabilityListener(false)
 
-        if (checkFirstDeviceEnabled) {
-            firstDeviceHostListener(false)
+        if (checkVueReachAbleEnabled) {
+            vueReachabilityListener(false)
         }
 
-        if (checkSecondDeviceEnabled) {
-            secondDeviceHostListener(false)
+        if (checkFuseReachAbleEnabled) {
+            fuseReachabilityListener(false)
         }
     }
 
@@ -136,13 +154,13 @@ object ReachAbilityManager : BroadcastReceiver() {
      * the the BaseActivity.
      * Will only inform in changes, not if the same state as previous is received.
      * */
-    private fun checkHostBackOffice() {
+    private fun checkBackOfficeReachAbility() {
 
-        useCaseBackEnd.execute(ReachAbilityCallParams(InternetAddress(backOfficeAddress.host)), {
+        useCaseBackEnd.execute(EmptyParams(), {
 
-            if (it.host.isReachAble != backOfficeAddress.isReachAble) {
-                backOfficeAddress.isReachAble = it.host.isReachAble
-                primaryHostListener(backOfficeAddress.isReachAble)
+            if (it.result != isBackOfficeReachable) {
+                isBackOfficeReachable = it.result
+                backOfficeReachabilityListener(isBackOfficeReachable)
             }
 
         }, {
@@ -155,28 +173,13 @@ object ReachAbilityManager : BroadcastReceiver() {
      * the the BaseActivity.
      * Will only inform in changes, not if the same state as previous is received for each devices/host
      * */
-    fun checkDevicesArray() {
+    fun checkReachAbilityVUE() {
 
-        useCaseDevices.execute(ReachAbilityDeviceCallParams(buildArrayFromHosts()), { entity ->
-            entity.internetAddressArray.forEach {
+        useCaseDevice.execute(vueDevice, {
 
-                when (it.host) {
-
-                    firstDevice.host -> {
-                        if (it.isReachAble != firstDevice.isReachAble) {
-                            firstDevice.isReachAble = it.isReachAble
-                            firstDeviceHostListener(firstDevice.isReachAble)
-                        }
-                    }
-
-                    secondDevice.host -> {
-                        if (it.isReachAble != secondDevice.isReachAble) {
-                            secondDevice.isReachAble = it.isReachAble
-                            secondDeviceHostListener(secondDevice.isReachAble)
-                        }
-                    }
-                }
-
+            if (it.result != vueDevice.isReachAble) {
+                vueDevice.isReachAble = it.result
+                vueReachabilityListener(vueDevice.isReachAble)
             }
 
         }, {
@@ -185,35 +188,32 @@ object ReachAbilityManager : BroadcastReceiver() {
     }
 
     /**
-     * Build an array of host to send to the use case params of the Devices logic.
+     * Through the use case checks the reachability of the Devices Array and using the block function calls back to
+     * the the BaseActivity.
+     * Will only inform in changes, not if the same state as previous is received for each devices/host
      * */
-    private fun buildArrayFromHosts(): ArrayList<InternetAddress> {
-        val arrayListHost: ArrayList<InternetAddress> = arrayListOf()
-        if (!firstDevice.host.isEmpty() && checkFirstDeviceEnabled) {
-            arrayListHost.add(firstDevice)
-        }
-        if (!secondDevice.host.isEmpty() && checkSecondDeviceEnabled) {
-            arrayListHost.add(secondDevice)
-        }
-        return arrayListHost
+    fun checkReachAbilityFUSE() {
+
+        useCaseDevice.execute(fuseDevice, {
+            if (it.result != fuseDevice.isReachAble) {
+                fuseDevice.isReachAble = it.result
+                fuseReachabilityListener(fuseDevice.isReachAble)
+            }
+
+        }, {
+            //do nothing
+        })
     }
 
 
-    /**
-     * This logic is pending to be approved and tested.
-     * It checks the devices reach ability every 2 seconds
-     * */
-    fun launchVUEListener() {
-        val period = Long.MAX_VALUE
-        val countDownInterval = 2000L
+    fun startTimerVUE() {
+        Log.d(TAG, "timer VUE reach ability started.")
+        timer.start()
+    }
 
-        object : CountDownTimer(period, countDownInterval) {
-            override fun onTick(millisUntilFinished: Long) {
-                checkDevicesArray()
-            }
-
-            override fun onFinish() = Unit
-        }.start()
+    fun stopTimerVUE() {
+        Log.d(TAG, "timer VUE reach ability stopped.")
+        timer.cancel()
     }
 
 }

@@ -1,20 +1,28 @@
 package com.example.domain.base
 
 import com.example.domain.entity.BaseEntity
+import com.example.domain.entity.BaseParams
 import com.example.domain.exceptions.CustomException
 import com.example.domain.exceptions.ExceptionType
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.Main
 
-abstract class BaseCoRoutineUseCase<T : BaseEntity, Params> {
+abstract class BaseCoRoutineUseCase<T : BaseEntity, Params : BaseParams> {
 
     private var job: Job? = null
+
+    companion object {
+        private const val TAG: String = "BaseCoRoutineUseCase"
+    }
 
     fun execute(params: Params, block: suspend CoroutineScope.(T) -> Unit,
                 blockError: (CustomException?) -> Unit) {
         job = launchAsync {
             async({
-                block(buildRepoCall(params))
+                val result = buildRepoCall(params)
+                launchAsync {
+                    block(result)
+                }
             }, {
                 blockError(it)
             })
@@ -29,7 +37,7 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params> {
      */
     private fun launchAsync(block: suspend CoroutineScope.() -> Unit): Job =
             GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, {
-                if (it != null) println("BaseCoRoutineUseCase: $it")
+                if (it != null) Log.e(TAG, it.message ?: "", it)
             }, {
                 block()
             })
@@ -43,7 +51,7 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params> {
     private suspend fun <T> async(block: suspend CoroutineScope.() -> T, blockError: (CustomException?) -> T): Deferred<T> {
         return GlobalScope.async(Dispatchers.Default, CoroutineStart.DEFAULT, {
             if (it != null) {
-                println("BaseCoRoutineUseCase: $it")
+                Log.e(TAG, it.message ?: "", it)
                 blockError(CustomException(it, ExceptionType.UNDEFINED))
             }
         }, {
@@ -67,7 +75,7 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params> {
      */
     fun cancel() {
         GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, {
-            if (it != null) println("BaseCoRoutineUseCase: $it")
+            if (it != null) Log.e(TAG, it.message ?: "", it)
         }, {
             job?.cancelAndJoin()
         })

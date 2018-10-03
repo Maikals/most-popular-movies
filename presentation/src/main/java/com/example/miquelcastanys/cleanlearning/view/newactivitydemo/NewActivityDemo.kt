@@ -5,7 +5,7 @@ import android.widget.Toast
 import com.example.miquelcastanys.cleanlearning.view.base.BaseActivity
 import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui.newactivitydemo.NewActivityDemoFragment
 
-class NewActivityDemo : BaseActivity() {
+class NewActivityDemo : BaseActivity()  {
 
 
     override fun createFragmentAndSettingTAG() {

@@ -8,11 +8,15 @@ import android.support.v7.widget.Toolbar
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import kotlinx.android.synthetic.main.activity_base.*
+import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface {
     protected var currentTag: String? = null
     protected var currentFragment: Fragment? = null
     protected var isConnected: Boolean = true
+
+    @Inject
+    lateinit var reachAbilityManager:ReachAbilityManager
 
     override fun isInternetReachable(): Boolean = isConnected
 
@@ -31,17 +35,16 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface
 
     override fun onResume() {
         super.onResume()
-
-
-        ReachAbilityManager.setBackOfficeReachAbleListener("vetscanvue.abaxis.com") {
+        // SET A GLOBAL STATE VAR TO MANAGE CHANGES IN DEVICES / BO
+        reachAbilityManager.setBackOfficeReachAbleListener {
             onConnectivityChanges(it)
         }
 
-        ReachAbilityManager.setFirstDeviceReachAbleListener("192.168.1.20") {
+        reachAbilityManager.setReachAbleListenerVUE {
             onConnectivityChangesVUE(it)
         }
 
-        ReachAbilityManager.setSecondDeviceReachAbleListener("192.168.1.151") {
+        reachAbilityManager.setReachAbleListenerFUSE {
             onConnectivityChangesFUSE(it)
         }
 

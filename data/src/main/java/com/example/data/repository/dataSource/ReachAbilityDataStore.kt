@@ -1,7 +1,7 @@
-package com.example.domain.repository
+package com.example.data.repository.dataSource
 
 import com.example.domain.entity.ReachAbilityEntity
 
-interface ReachAbility {
+interface ReachAbilityDataStore {
     suspend fun pingHealthBackOffice(): ReachAbilityEntity
 }

@@ -1,8 +1,8 @@
 package com.example.domain.repository
 
-import com.example.domain.entity.ReachAbilityDeviceCallParams
-import com.example.domain.entity.ReachAbilityDeviceEntity
+import com.example.domain.entity.InternetAddressParams
+import com.example.domain.entity.ReachAbilityEntity
 
 interface ReachAbilityDevices {
-    fun checkDevices(params: ReachAbilityDeviceCallParams): ReachAbilityDeviceEntity
+    fun checkDevices(internetAddressParams: InternetAddressParams): ReachAbilityEntity
 }

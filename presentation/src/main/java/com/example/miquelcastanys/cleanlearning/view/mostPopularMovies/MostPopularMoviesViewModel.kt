@@ -1,6 +1,7 @@
 package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
 
 import android.arch.lifecycle.MutableLiveData
+import com.example.domain.entity.EmptyParams
 import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoRoutines
@@ -20,7 +21,8 @@ class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCas
     val onDataReceived = MutableLiveData<Boolean>()
     private var loading: Boolean = false
 
-    @Synchronized fun getMostPopularMovies(refresh: Boolean = false) {
+    @Synchronized
+    fun getMostPopularMovies(refresh: Boolean = false) {
         if (!loading) {
             loading = true
             if (refresh) currentPage = 1
@@ -38,15 +40,13 @@ class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCas
     }
 
     fun getSavedMovies() {
-        execute(localUseCase, null,
-                {
-                    if (it.result)
-                        manageMovieListEntityReceived(true, it)
-                    onDataReceived.postValue(it.result)
-                },
-                {
-                    onDataReceived.postValue(false)
-                })
+        execute(localUseCase, EmptyParams(), {
+            if (it.result)
+                manageMovieListEntityReceived(true, it)
+            onDataReceived.postValue(it.result)
+        }, {
+            onDataReceived.postValue(false)
+        })
     }
 
     private fun manageMovieListEntityReceived(refreshList: Boolean, moviesListEntity: MovieListEntity) {
