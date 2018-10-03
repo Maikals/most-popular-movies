@@ -14,35 +14,40 @@ import javax.inject.Singleton
 @Singleton
 class RealmHelper @Inject constructor(context: Context) {
 
+    companion object {
+        private const val REALM_KEY = "8ab5dd83af7c1b20452927c339eb7701e0d727c31682978c7c92a8193b11e595"
+    }
 
     init {
         Realm.init(context)
         Realm.setDefaultConfiguration(RealmConfiguration.Builder()
                 .name("moviesRealmDatabase.realm")
-                .schemaVersion(3)
-//                .encryptionKey(byteArrayOf())
+                .schemaVersion(4)
+                .encryptionKey(REALM_KEY.toByteArray())
                 .build())
     }
 
 
-    fun getMostPopularList(): CompletableDeferred<List<MovieEntity>> {
-        val realmInstance = getRealmInstance()
-        val completableDeferred = CompletableDeferred(realmInstance.where(MovieRealmEntity::class.java).findAll().map {
-            MovieEntity(it.id!!,
-                    it.video!!,
-                    it.voteAverage!!,
-                    it.title!!,
-                    it.popularity!!,
-                    it.posterPath!!,
-                    it.genreIds?.map { it.id!! } ?: listOf(),
-                    it.backdropPath!!,
-                    it.adult!!,
-                    it.overview!!,
-                    it.releaseDate!!)
-        })
-        realmInstance.close()
-        return completableDeferred
-    }
+    fun getMostPopularList(): CompletableDeferred<List<MovieEntity>> =
+            openRealmInstance { realm ->
+                CompletableDeferred(realm
+                        .where(MovieRealmEntity::class.java)
+                        .findAll()
+                        .map { movie ->
+                            MovieEntity(movie.id!!,
+                                    movie.video!!,
+                                    movie.voteAverage!!,
+                                    movie.title!!,
+                                    movie.popularity!!,
+                                    movie.posterPath!!,
+                                    movie.genreIds?.map { it.id!! } ?: listOf(),
+                                    movie.backdropPath!!,
+                                    movie.adult!!,
+                                    movie.overview!!,
+                                    movie.releaseDate!!)
+                        })
+            }
+
 
     fun setMostPopularList(moviesList: List<MovieEntity>) =
             executeTransaction { realm ->
@@ -75,30 +80,31 @@ class RealmHelper @Inject constructor(context: Context) {
                 id = genreId
             }
 
-    fun movieExists(movie: MovieEntity): Boolean {
-        val realmInstance = getRealmInstance()
+    fun movieExists(movie: MovieEntity): Boolean =
+            openRealmInstance { realm ->
+                realm.where(MovieRealmEntity::class.java).equalTo("id", movie.id).findFirst() != null
+            }
 
-        realmInstance.where(GenreRealmEntity::class.java).notEqualTo("movie.id", 0.toInt())
-        val b = realmInstance.where(MovieRealmEntity::class.java).equalTo("id", movie.id).findFirst() != null
-        realmInstance.close()
-        return b
-    }
-
-    fun getGenreEntityByID(genreId: Int): GenreRealmEntity {
-        val realmInstance = getRealmInstance()
-        val findFirst = realmInstance.where(GenreRealmEntity::class.java).equalTo("id", genreId).findFirst()!!
-        realmInstance.close()
-        return findFirst
-    }
+    fun getGenreEntityByID(genreId: Int): GenreRealmEntity =
+            openRealmInstance { realm ->
+                realm.where(GenreRealmEntity::class.java).equalTo("id", genreId).findFirst()!!
+            }
 
     private fun genreExists(genreId: Int): Boolean =
-            getRealmInstance().where(GenreRealmEntity::class.java).equalTo("id", genreId).findFirst() != null
+            openRealmInstance { realm ->
+                realm.where(GenreRealmEntity::class.java).equalTo("id", genreId).findFirst() != null
+            }
 
-    private fun executeTransaction(fn: (Realm) -> Unit) {
-        val realmInstance = getRealmInstance()
-        realmInstance.executeTransaction { fn(it) }
-        realmInstance.close()
+    private fun executeTransaction(fn: (Realm) -> Unit) =
+            openRealmInstance { realm ->
+                realm.executeTransaction { fn(it) }
+            }
+
+    private fun <T> openRealmInstance(fn: (Realm) -> T): T {
+        val realm = Realm.getDefaultInstance()
+        val result = fn(realm)
+        realm.close()
+        return result
     }
 
-    private fun getRealmInstance() = Realm.getDefaultInstance()
 }
