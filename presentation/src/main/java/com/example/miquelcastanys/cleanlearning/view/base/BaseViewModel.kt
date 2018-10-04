@@ -10,6 +10,8 @@ import com.example.domain.exceptions.CustomException
 
 abstract class BaseViewModel : ViewModel() {
 
+    private val list: ArrayList<BaseCoRoutineUseCase<BaseEntity, BaseParams>> = arrayListOf()
+
     fun <T : BaseEntity, Params : BaseParams> execute(useCase: BaseCoRoutineUseCase<T, Params>, params: Params, onResultOk: (T) -> Unit, onResultError: (String) -> Unit) {
         useCase.execute(params, {
             if (it.result) onResultOk(it)
@@ -18,5 +20,14 @@ abstract class BaseViewModel : ViewModel() {
             Log.e("BaseViewModel", "Error", it)
             onResultError(ExceptionManager.manageError(it ?: CustomException()))
         })
+    }
+
+    fun addUseCase(useCase:BaseCoRoutineUseCase<BaseEntity, BaseParams>){
+        list.add(useCase)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        list.forEach { it.cancel() }
     }
 }

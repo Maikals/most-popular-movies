@@ -20,6 +20,7 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
                                               private val useCaseDevice: CheckDevicesReachAbilityUseCase) : BroadcastReceiver() {
 
     private val timer: CountDownTimer
+    private var isTimerRunning: Boolean = false
 
     companion object {
         private const val PERIOD = Long.MAX_VALUE
@@ -28,7 +29,6 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
     }
 
     init {
-
         /**
          * This logic is pending to be approved and tested.
          * It checks the devices reach ability every 2 seconds
@@ -45,7 +45,7 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
     }
 
     /**BackOffice Address with its listener and its block setter*/
-    private var isBackOfficeReachable: Boolean = false
+    var isBackOfficeReachable: Boolean = false
     private lateinit var backOfficeReachabilityListener: (Boolean) -> Unit
 
     /**
@@ -149,23 +149,27 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
         }
     }
 
+    //Usage from Outside class and with a block as a callback
+    fun checkBackOfficeReachAbility(block: (Boolean) -> Unit) {
+        useCaseBackEnd.execute(EmptyParams(), {
+            block(it.result)
+        }, {
+            //do nothing
+        })
+    }
+
     /**
      * Through the use case checks the reachability of the BO and using the block function calls back to
      * the the BaseActivity.
      * Will only inform in changes, not if the same state as previous is received.
      * */
     private fun checkBackOfficeReachAbility() {
-
-        useCaseBackEnd.execute(EmptyParams(), {
-
-            if (it.result != isBackOfficeReachable) {
-                isBackOfficeReachable = it.result
+        checkBackOfficeReachAbility {
+            if (it != isBackOfficeReachable) {
+                isBackOfficeReachable = it
                 backOfficeReachabilityListener(isBackOfficeReachable)
             }
-
-        }, {
-            //do nothing
-        })
+        }
     }
 
     /**
@@ -174,7 +178,6 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
      * Will only inform in changes, not if the same state as previous is received for each devices/host
      * */
     fun checkReachAbilityVUE() {
-
         useCaseDevice.execute(vueDevice, {
 
             if (it.result != vueDevice.isReachAble) {
@@ -207,13 +210,19 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
 
 
     fun startTimerVUE() {
-        Log.d(TAG, "timer VUE reach ability started.")
-        timer.start()
+        if (!isTimerRunning) {
+            timer.start()
+            isTimerRunning = true
+            Log.d(TAG, "timer VUE reach ability started.")
+        }
     }
 
     fun stopTimerVUE() {
-        Log.d(TAG, "timer VUE reach ability stopped.")
-        timer.cancel()
+        if (isTimerRunning) {
+            timer.cancel()
+            isTimerRunning = false
+            Log.d(TAG, "timer VUE reach ability stopped.")
+        }
     }
 
 }

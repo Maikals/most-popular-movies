@@ -3,7 +3,6 @@ package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.SearchManager
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -24,6 +23,7 @@ import android.view.animation.TranslateAnimation
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.adapters.MostPopularMovieListAdapter
+import com.example.miquelcastanys.cleanlearning.buildViewModel
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.enumerations.EmptyViewEnumeration
 import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
@@ -86,11 +86,12 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
             inflater.inflate(R.layout.fragment_most_popular_movies, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setRefreshLayoutBehaviour()
         setRecyclerView()
         setEmptyView()
         setHasOptionsMenu(true)
-        createViewModel()
+        //createViewModel()
         getData()
 
         if (mostPopularMoviesRV.adapter == null)
@@ -115,8 +116,8 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         }
     }
 
-    private fun createViewModel() {
-        viewModel = ViewModelProviders.of(this, factory).get(MostPopularMoviesViewModel::class.java)
+    override fun createViewModel() {
+        viewModel = buildViewModel(factory, MostPopularMoviesViewModel::class.java)
     }
 
     override fun onResume() {

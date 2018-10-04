@@ -1,7 +1,5 @@
 package com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui.newactivitydemo
 
-import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,24 +7,16 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
+import com.example.miquelcastanys.cleanlearning.buildViewModel
 import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
 import com.example.miquelcastanys.cleanlearning.injector.module.MostPopularMoviesNewModule
-import com.example.miquelcastanys.cleanlearning.interfaces.MostPopularMoviesActivityFragmentInterface
 import com.example.miquelcastanys.cleanlearning.observe
-import com.example.miquelcastanys.cleanlearning.view.base.BaseActivityFragmentInterface
 import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
-import com.example.miquelcastanys.cleanlearning.view.base.ReachAbilityManager
 import kotlinx.android.synthetic.main.new_activity_demo_fragment.*
 import javax.inject.Inject
 
 
 class NewActivityDemoFragment : BaseFragment() {
-
-    @Inject
-    lateinit var reachAbilityManager: ReachAbilityManager
-
-    private var mostPopularMoviesActivityFragmentInterface: BaseActivityFragmentInterface? = null
-
 
     override fun setupFragmentComponent() {
         MostPopularMoviesApplication
@@ -52,28 +42,39 @@ class NewActivityDemoFragment : BaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        createViewModel()
+
         button_request_movies_new_fragment.setOnClickListener {
-            viewModel.getMovies()
-            reachAbilityManager.startTimerVUE()
+            checkReachAbility { result ->
+                if (result) {
+                    viewModel.getMovies()
+                } else {
+                    Toast.makeText(activity, "You need internet to retrieve results!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            startTimerVue()
         }
 
+        onDataReceived()
+        onCounterReceived()
+        stopTimerVue()
+        Toast.makeText(activity, "INTERNET: ${isInternetReachAble()}", Toast.LENGTH_LONG).show()
+
+    }
+
+    private fun onCounterReceived() {
+        observe(viewModel.requestCounter) {
+            counter_request.text = it.toString()
+        }
+    }
+
+    private fun onDataReceived() {
         observe(viewModel.onDataReceived) {
             message.text = it.toString()
         }
-
-        reachAbilityManager.stopTimerVUE()
-
-        Toast.makeText(activity,"INTERNET: ${mostPopularMoviesActivityFragmentInterface?.isInternetReachable()}",Toast.LENGTH_LONG).show()
-
     }
 
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        mostPopularMoviesActivityFragmentInterface = context as? BaseActivityFragmentInterface
-    }
-
-    private fun createViewModel() {
-        viewModel = ViewModelProviders.of(this, factory).get(NewActivityDemoViewModel::class.java)
+    override fun createViewModel() {
+        viewModel = buildViewModel(factory, NewActivityDemoViewModel::class.java)
     }
 }

@@ -5,20 +5,21 @@ import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import com.example.domain.base.Log
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import kotlinx.android.synthetic.main.activity_base.*
 import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface {
+
     protected var currentTag: String? = null
     protected var currentFragment: Fragment? = null
-    protected var isConnected: Boolean = false
 
     @Inject
     lateinit var reachAbilityManager: ReachAbilityManager
 
-    override fun isInternetReachable(): Boolean = isConnected
+    override fun isInternetReachable(): Boolean = reachAbilityManager.isBackOfficeReachable
 
     companion object {
         private const val CURRENT_FRAGMENT_TAG: String = "currentTag"
@@ -35,7 +36,7 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface
 
     override fun onResume() {
         super.onResume()
-        // SET A GLOBAL STATE VAR TO MANAGE CHANGES IN DEVICES / BO
+
         reachAbilityManager.setBackOfficeReachAbleListener {
             onConnectivityChanges(it)
         }
@@ -54,7 +55,7 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface
     @CallSuper
     open fun onConnectivityChanges(isConnected: Boolean) {
         //set a general param.
-        this.isConnected = isConnected
+        Log.d("BaseActvity: ", "onConnectivityChanges reached with isConnected: $isConnected")
     }
 
     @CallSuper
@@ -102,5 +103,17 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface
 
     override fun getToolbar(): Toolbar {
         return toolbar
+    }
+
+    override fun stopTimerVue() {
+        reachAbilityManager.stopTimerVUE()
+    }
+
+    override fun startTimerVue() {
+        reachAbilityManager.startTimerVUE()
+    }
+
+    override fun checkReachAbility(block: (Boolean) -> Unit) {
+        reachAbilityManager.checkBackOfficeReachAbility(block)
     }
 }

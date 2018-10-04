@@ -20,7 +20,7 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params : BaseParams> {
         job = launchAsync {
             async({
                 val result = buildRepoCall(params)
-                launchAsync {
+                launchMain {
                     block(result)
                 }
             }, {
@@ -36,6 +36,13 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params : BaseParams> {
      * @param block The block that will be executed inside coroutine
      */
     private fun launchAsync(block: suspend CoroutineScope.() -> Unit): Job =
+            GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, {
+                if (it != null) Log.e(TAG, it.message ?: "", it)
+            }, {
+                block()
+            })
+
+    private fun launchMain(block: suspend CoroutineScope.() -> Unit): Job =
             GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, {
                 if (it != null) Log.e(TAG, it.message ?: "", it)
             }, {
