@@ -5,7 +5,6 @@ import com.example.domain.base.BaseCoRoutineUseCase
 import com.example.domain.entity.BaseEntity
 import com.example.domain.entity.BaseParams
 import com.example.domain.entity.MostPopularMoviesParams
-import com.example.domain.entity.MovieListEntity
 import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoRoutines
 import com.example.miquelcastanys.cleanlearning.view.base.BaseViewModel
 
@@ -22,7 +21,7 @@ class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCaseC
     fun getMovies() {
         execute(useCase, MostPopularMoviesParams(currentPage++), {
             if (it.result) {
-                if(requestCounter.value == null) requestCounter.value = 0
+                if (requestCounter.value == null) requestCounter.value = 0
                 requestCounter.value = requestCounter.value?.plus(1)
                 requestCounter.postValue(requestCounter.value)
             }

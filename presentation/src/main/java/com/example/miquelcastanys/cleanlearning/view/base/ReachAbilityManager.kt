@@ -151,7 +151,7 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
 
     //Usage from Outside class and with a block as a callback
     fun checkBackOfficeReachAbility(block: (Boolean) -> Unit) {
-        useCaseBackEnd.execute(EmptyParams(), {
+        useCaseBackEnd.executeAsync(EmptyParams(), {
             block(it.result)
         }, {
             //do nothing
@@ -178,7 +178,7 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
      * Will only inform in changes, not if the same state as previous is received for each devices/host
      * */
     fun checkReachAbilityVUE() {
-        useCaseDevice.execute(vueDevice, {
+        useCaseDevice.executeAsync(vueDevice, {
 
             if (it.result != vueDevice.isReachAble) {
                 vueDevice.isReachAble = it.result
@@ -197,7 +197,7 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
      * */
     fun checkReachAbilityFUSE() {
 
-        useCaseDevice.execute(fuseDevice, {
+        useCaseDevice.executeAsync(fuseDevice, {
             if (it.result != fuseDevice.isReachAble) {
                 fuseDevice.isReachAble = it.result
                 fuseReachabilityListener(fuseDevice.isReachAble)

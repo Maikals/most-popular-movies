@@ -32,8 +32,8 @@ object MovieListMapper {
                 movieDTO.release_date ?: "")
     }
 
-    fun toDomainObject(movieRealmEntityList: List<MovieRealmEntity>): MovieListEntity =
-            MovieListEntity(-1, -1, movieRealmEntityList.map { movie ->
+    fun toDomainObject(movieRealmEntityList: List<MovieRealmEntity>?): MovieListEntity? =
+            MovieListEntity(-1, -1, movieRealmEntityList?.map { movie ->
                 MovieEntity(movie.id!!,
                         movie.video!!,
                         movie.voteAverage!!,
@@ -45,5 +45,5 @@ object MovieListMapper {
                         movie.adult!!,
                         movie.overview!!,
                         movie.releaseDate!!)
-            })
+            } ?: listOf())
 }

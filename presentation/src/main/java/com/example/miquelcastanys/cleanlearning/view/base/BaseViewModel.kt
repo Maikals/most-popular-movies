@@ -13,7 +13,7 @@ abstract class BaseViewModel : ViewModel() {
     private val list: ArrayList<BaseCoRoutineUseCase<BaseEntity, BaseParams>> = arrayListOf()
 
     fun <T : BaseEntity, Params : BaseParams> execute(useCase: BaseCoRoutineUseCase<T, Params>, params: Params, onResultOk: (T) -> Unit, onResultError: (String) -> Unit) {
-        useCase.execute(params, {
+        useCase.executeAsync(params, {
             if (it.result) onResultOk(it)
             else onResultError(ExceptionManager.manageError(CustomException()))
         }, {
