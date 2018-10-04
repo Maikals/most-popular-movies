@@ -2,6 +2,7 @@ package com.example.data.entity.mapper
 
 import com.example.data.entity.MovieDTO
 import com.example.data.entity.MovieListDTO
+import com.example.data.entity.MovieRealmEntity
 import com.example.domain.entity.MovieEntity
 import com.example.domain.entity.MovieListEntity
 
@@ -30,4 +31,19 @@ object MovieListMapper {
                 movieDTO.overview ?: "",
                 movieDTO.release_date ?: "")
     }
+
+    fun toDomainObject(movieRealmEntityList: List<MovieRealmEntity>): MovieListEntity =
+            MovieListEntity(-1, -1, movieRealmEntityList.map { movie ->
+                MovieEntity(movie.id!!,
+                        movie.video!!,
+                        movie.voteAverage!!,
+                        movie.title!!,
+                        movie.popularity!!,
+                        movie.posterPath!!,
+                        movie.genreIds?.map { it.id!! } ?: listOf(),
+                        movie.backdropPath!!,
+                        movie.adult!!,
+                        movie.overview!!,
+                        movie.releaseDate!!)
+            })
 }

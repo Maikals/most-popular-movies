@@ -5,6 +5,7 @@ import com.example.data.entity.mapper.MovieListMapper
 import com.example.data.net.MostPopularMoviesService
 import com.example.domain.entity.MovieEntity
 import com.example.domain.entity.MovieListEntity
+import kotlinx.coroutines.experimental.CompletableDeferred
 import javax.inject.Inject
 
 
@@ -17,6 +18,8 @@ class MostPopularDataStoreImpl @Inject constructor(private val mostPopularMovies
             realmHelper.setMostPopularList(moviesList)
 
     override suspend fun getMostPopularMoviesLocal(): MovieListEntity =
-            MovieListEntity(-1, -1, realmHelper.getMostPopularList().await())
+            realmHelper.getMostPopularList {
+                CompletableDeferred(MovieListMapper.toDomainObject(it))
+            }.await()
 
 }

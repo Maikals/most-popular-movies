@@ -7,7 +7,7 @@ import com.example.domain.entity.MovieEntity
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmList
-import kotlinx.coroutines.experimental.CompletableDeferred
+import io.realm.RealmObject
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,40 +22,20 @@ class RealmHelper @Inject constructor(context: Context) {
         Realm.init(context)
         Realm.setDefaultConfiguration(RealmConfiguration.Builder()
                 .name("moviesRealmDatabase.realm")
-                .schemaVersion(4)
+                .schemaVersion(6)
                 .encryptionKey(REALM_KEY.toByteArray())
                 .build())
     }
 
-
-    fun getMostPopularList(): CompletableDeferred<List<MovieEntity>> =
-            openRealmInstance { realm ->
-                CompletableDeferred(realm
-                        .where(MovieRealmEntity::class.java)
-                        .findAll()
-                        .map { movie ->
-                            MovieEntity(movie.id!!,
-                                    movie.video!!,
-                                    movie.voteAverage!!,
-                                    movie.title!!,
-                                    movie.popularity!!,
-                                    movie.posterPath!!,
-                                    movie.genreIds?.map { it.id!! } ?: listOf(),
-                                    movie.backdropPath!!,
-                                    movie.adult!!,
-                                    movie.overview!!,
-                                    movie.releaseDate!!)
-                        })
-            }
-
+    fun <T> getMostPopularList(block: (List<MovieRealmEntity>) -> T): T =
+            block(getAllEntities(MovieRealmEntity::class.java))
 
     fun setMostPopularList(moviesList: List<MovieEntity>) =
-            executeTransaction { realm ->
-                moviesList.forEach {
-                    if (!movieExists(it))
-                        realm.copyToRealmOrUpdate(createMovieRealmEntityFromMovieEntity(it))
-                }
-            }
+            saveEntities(moviesList.asSequence()
+                    .filter { !movieExists(it.id) }
+                    .map {
+                        createMovieRealmEntityFromMovieEntity(it)
+                    }.toList())
 
     private fun createMovieRealmEntityFromMovieEntity(movie: MovieEntity): MovieRealmEntity =
             MovieRealmEntity().apply {
@@ -80,25 +60,41 @@ class RealmHelper @Inject constructor(context: Context) {
                 id = genreId
             }
 
-    fun movieExists(movie: MovieEntity): Boolean =
-            openRealmInstance { realm ->
-                realm.where(MovieRealmEntity::class.java).equalTo("id", movie.id).findFirst() != null
-            }
+    fun movieExists(movieId: Int): Boolean =
+            entityExists(MovieRealmEntity::class.java, "id", movieId)
 
-    fun getGenreEntityByID(genreId: Int): GenreRealmEntity =
-            openRealmInstance { realm ->
-                realm.where(GenreRealmEntity::class.java).equalTo("id", genreId).findFirst()!!
-            }
+    fun getGenreEntityByID(genreId: Int): GenreRealmEntity? =
+            getEntity(GenreRealmEntity::class.java, "id", genreId)
 
     private fun genreExists(genreId: Int): Boolean =
-            openRealmInstance { realm ->
-                realm.where(GenreRealmEntity::class.java).equalTo("id", genreId).findFirst() != null
-            }
+            entityExists(GenreRealmEntity::class.java, "id", genreId)
+
 
     private fun executeTransaction(fn: (Realm) -> Unit) =
             openRealmInstance { realm ->
                 realm.executeTransaction { fn(it) }
             }
+
+    private fun <T : RealmObject> saveEntities(entityList: List<T>) {
+        executeTransaction { realm ->
+            entityList.forEach {
+                realm.copyToRealmOrUpdate(it)
+            }
+        }
+    }
+
+    private fun <T : RealmObject> getEntity(entityType: Class<T>, idField: String, id: Int): T? =
+            openRealmInstance { realm ->
+                realm.where(entityType).equalTo(idField, id).findFirst()
+            }
+
+    private fun <T : RealmObject> getAllEntities(entityType: Class<T>): List<T> =
+            openRealmInstance { realm ->
+                realm.where(entityType).findAll()
+            }
+
+    private fun <T : RealmObject> entityExists(entityType: Class<T>, idField: String, id: Int): Boolean =
+            getEntity(entityType, idField, id) != null
 
     private fun <T> openRealmInstance(fn: (Realm) -> T): T {
         val realm = Realm.getDefaultInstance()

@@ -13,10 +13,10 @@ import javax.inject.Inject
 abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface {
     protected var currentTag: String? = null
     protected var currentFragment: Fragment? = null
-    protected var isConnected: Boolean = true
+    protected var isConnected: Boolean = false
 
     @Inject
-    lateinit var reachAbilityManager:ReachAbilityManager
+    lateinit var reachAbilityManager: ReachAbilityManager
 
     override fun isInternetReachable(): Boolean = isConnected
 
