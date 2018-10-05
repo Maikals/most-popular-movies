@@ -3,15 +3,16 @@ package com.example.data.repository.dataSource
 import com.example.data.db.RealmHelper
 import com.example.data.entity.mapper.MovieListMapper
 import com.example.data.net.MostPopularMoviesService
+import com.example.data.net.MovieServiceImpl
 import com.example.domain.entity.MovieEntity
 import com.example.domain.entity.MovieListEntity
 import javax.inject.Inject
 
 
-class MostPopularDataStoreImpl @Inject constructor(private val mostPopularMoviesService: MostPopularMoviesService,
+class MostPopularDataStoreImpl @Inject constructor(private val mostPopularMoviesService: MovieServiceImpl,
                                                    private val realmHelper: RealmHelper) : MostPopularMoviesStore {
     override suspend fun getMostPopularMoviesList(page: Int): MovieListEntity =
-            MovieListMapper.toDomainObject(mostPopularMoviesService.getMostPopularMoviesList(page).await())
+            MovieListMapper.toDomainObject(mostPopularMoviesService.createService().getMostPopularMoviesList(page).await())
 
     override fun setMostPopularMoviesLocal(moviesList: List<MovieEntity>) =
             realmHelper.setMostPopularList(moviesList)

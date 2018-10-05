@@ -12,7 +12,12 @@ import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresen
 import com.example.miquelcastanys.cleanlearning.view.base.BaseViewModel
 
 
-class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCaseCoRoutines, private val localUseCase: GetSavedMoviesUseCase) : BaseViewModel() {
+class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCaseCoRoutines,
+                                 private val localUseCase: GetSavedMoviesUseCase) : BaseViewModel() {
+
+    init {
+        addUseCases(useCase, localUseCase)
+    }
 
     var currentPage = 1
     val mostPopularMovies = MutableLiveData<ArrayList<BaseListViewEntity>>().apply {
@@ -70,10 +75,5 @@ class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCas
 
     private fun removeFooter() {
         mostPopularMovies.value?.removeAll { it is FooterViewViewEntity }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        useCase.cancel()
     }
 }

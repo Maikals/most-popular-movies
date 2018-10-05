@@ -3,7 +3,7 @@ package com.example.miquelcastanys.cleanlearning.view.newactivitydemo
 import android.os.Bundle
 import android.widget.Toast
 import com.example.miquelcastanys.cleanlearning.view.base.BaseActivity
-import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui.newactivitydemo.NewActivityDemoFragment
+import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui.NewActivityDemoFragment
 
 class NewActivityDemo : BaseActivity()  {
 

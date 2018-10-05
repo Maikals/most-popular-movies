@@ -1,4 +1,4 @@
-package com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui.newactivitydemo
+package com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,13 +7,18 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
-import com.example.miquelcastanys.cleanlearning.buildViewModel
 import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
 import com.example.miquelcastanys.cleanlearning.injector.module.MostPopularMoviesNewModule
+import com.example.miquelcastanys.cleanlearning.koinjector.newFragmentModule
 import com.example.miquelcastanys.cleanlearning.observe
 import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
 import kotlinx.android.synthetic.main.new_activity_demo_fragment.*
-import javax.inject.Inject
+import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.core.scope.Scope
+import org.koin.standalone.StandAloneContext.loadKoinModules
+import org.koin.standalone.get
+import org.koin.standalone.getKoin
+import org.koin.standalone.inject
 
 
 class NewActivityDemoFragment : BaseFragment() {
@@ -25,15 +30,16 @@ class NewActivityDemoFragment : BaseFragment() {
                 .inject(this)
     }
 
-    @Inject
-    lateinit var factory: MostPopularNewModelFactory
+
+    //val factory: MostPopularNewModelFactory by inject()
 
     companion object {
         const val TAG = "NewActivityDemoFragment"
         fun newInstance() = NewActivityDemoFragment()
     }
 
-    private lateinit var viewModel: NewActivityDemoViewModel
+    lateinit var session: Scope
+    val newActivityDemoViewModel: NewActivityDemoViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -42,11 +48,13 @@ class NewActivityDemoFragment : BaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
+        //loadKoinModules(newFragmentModule)
+        session = getKoin().createScope("org.scope")
+        createViewModel()
         button_request_movies_new_fragment.setOnClickListener {
             checkReachAbility { result ->
                 if (result) {
-                    viewModel.getMovies()
+                    newActivityDemoViewModel.getMovies()
                 } else {
                     Toast.makeText(activity, "You need internet to retrieve results!", Toast.LENGTH_SHORT).show()
                 }
@@ -63,18 +71,23 @@ class NewActivityDemoFragment : BaseFragment() {
     }
 
     private fun onCounterReceived() {
-        observe(viewModel.requestCounter) {
+        observe(newActivityDemoViewModel.requestCounter) {
             counter_request.text = it.toString()
         }
     }
 
     private fun onDataReceived() {
-        observe(viewModel.onDataReceived) {
+        observe(newActivityDemoViewModel.onDataReceived) {
             message.text = it.toString()
         }
     }
 
     override fun createViewModel() {
-        viewModel = buildViewModel(factory, NewActivityDemoViewModel::class.java)
+        // newActivityDemoViewModel = buildViewModel(factory, NewActivityDemoViewModel::class.java)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        session.close()
     }
 }
