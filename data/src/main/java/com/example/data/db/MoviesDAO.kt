@@ -3,7 +3,6 @@ package com.example.data.db
 import com.example.data.entity.GenreRealmEntity
 import com.example.data.entity.MovieRealmEntity
 import com.example.domain.entity.MovieEntity
-import io.realm.Realm
 import io.realm.RealmList
 import javax.inject.Inject
 
@@ -45,6 +44,8 @@ class MoviesDAO @Inject constructor(private val realmManager: RealmManager) {
                 }
             }
 
-    fun movieExists(realm: Realm, movieId: Int): Boolean =
-            realmManager.entityExists(realm, MovieRealmEntity::class.java, "id", movieId)
+    fun movieExists(movieId: Int): Boolean =
+            realmManager.executeTransaction { realm ->
+                realmManager.entityExists(realm, MovieRealmEntity::class.java, "id", movieId)
+            }!!
 }
