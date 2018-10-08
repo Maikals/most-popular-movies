@@ -17,11 +17,6 @@ abstract class BaseFragment : Fragment(), KoinComponent {
         setupFragmentComponent()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        //createViewModel()
-    }
-
     protected abstract fun setupFragmentComponent()
 
     protected abstract fun createViewModel()
