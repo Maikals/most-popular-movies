@@ -1,22 +1,17 @@
 package com.example.miquelcastanys.cleanlearning.presenter
 
-import com.example.domain.entity.MovieListEntity
-import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoRoutines
 import com.example.domain.interactor.GetSearchMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
-import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
-import com.example.miquelcastanys.cleanlearning.injector.PerFragment
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesView
-import io.reactivex.observers.DisposableObserver
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 import java.util.*
-import javax.inject.Inject
 
-@PerFragment
-class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMoviesUseCaseCoRoutines: GetMostPopularMoviesUseCaseCoRoutines,
-                                                     private val searchMoviesUseCase: GetSearchMoviesUseCase) : Presenter {
+class MostPopularMoviesPresenter : Presenter, KoinComponent {
 
-    @Inject
+    private val searchMoviesUseCase: GetSearchMoviesUseCase by inject()
+
     lateinit var view: MostPopularMoviesView
     val moviesList: ArrayList<BaseListViewEntity> = ArrayList()
     var isLastPage = false
@@ -30,7 +25,7 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         if (isSearching) {
             searchMovieByText()
         } else {
-            getMostPopularMoviesList(true)
+          //  getMostPopularMoviesList(true)
         }
     }
 
@@ -39,36 +34,36 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
     override fun pause() {}
 
     override fun destroy() {
-        searchMoviesUseCase.dispose()
+       // searchMoviesUseCase.dispose()
 
     }
-
-    fun loadMoreElements() {
-        if (isSearching) {
-            searchMovieByText(searchString)
-        } else {
-            getMostPopularMoviesList()
-        }
-    }
-
-    fun getMostPopularMoviesList(refreshList: Boolean = false) {
-//        mostPopularMoviesUseCase.execute(MostPopularMoviesParams(currentPage++), MoviesListObserver(this, refreshList))
-//        launch {
-//            val moviesListEntity = mostPopularMoviesUseCaseCoroutines.coroutinesTest(MostPopularMoviesParams(currentPage++))
-//            launch(UI) {
-//                if (moviesListEntity.moviesList.isNotEmpty()) manageMovieListEntityReceived(false, moviesListEntity)
-//                else manageEmptyList()
-//            }
+//
+//    fun loadMoreElements() {
+//        if (isSearching) {
+//            searchMovieByText(searchString)
+//        } else {
+//            getMostPopularMoviesList()
 //        }
+//    }
 
-    }
+//    fun getMostPopularMoviesList(refreshList: Boolean = false) {
+////        mostPopularMoviesUseCase.execute(MostPopularMoviesParams(currentPage++), MoviesListObserver(this, refreshList))
+////        launch {
+////            val moviesListEntity = mostPopularMoviesUseCaseCoroutines.coroutinesTest(MostPopularMoviesParams(currentPage++))
+////            launch(UI) {
+////                if (moviesListEntity.moviesList.isNotEmpty()) manageMovieListEntityReceived(false, moviesListEntity)
+////                else manageEmptyList()
+////            }
+////        }
+//
+//    }
 
-    fun manageMovieListEntityReceived(refreshList: Boolean, moviesListEntity: MovieListEntity) {
-        if (refreshList) moviesList.clear()
-        setIsLastPage(currentPage, moviesListEntity.totalPages)
-        addResultToMoviesList(MoviesListPresentationMapper.toPresentationObject(moviesListEntity))
-        manageList()
-    }
+//    fun manageMovieListEntityReceived(refreshList: Boolean, moviesListEntity: MovieListEntity) {
+//        if (refreshList) moviesList.clear()
+//        setIsLastPage(currentPage, moviesListEntity.totalPages)
+//        addResultToMoviesList(MoviesListPresentationMapper.toPresentationObject(moviesListEntity))
+//        manageList()
+//    }
 
     fun manageList() {
         removeFooter()
@@ -80,14 +75,14 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
         view.showProgressBar(false)
     }
 
-    fun manageEmptyList() {
-        currentPage = 1
-        moviesList.clear()
-        view.showProgressBar(false)
-        view.hideRecyclerView()
-        view.showEmptyView()
-//        view.setLoadingState(false)
-    }
+//    fun manageEmptyList() {
+//        currentPage = 1
+//        moviesList.clear()
+//        view.showProgressBar(false)
+//        view.hideRecyclerView()
+//        view.showEmptyView()
+////        view.setLoadingState(false)
+//    }
 
 
     private fun addFooter() {
@@ -108,32 +103,32 @@ class MostPopularMoviesPresenter @Inject constructor(private val mostPopularMovi
 
     fun searchMovieByText(newText: String? = "", refreshList: Boolean = false) {
         isSearching = true
-        if (newText != searchString) searchMoviesUseCase.dispose()
+        if (newText != searchString) /*searchMoviesUseCase.dispose()*/
         searchString = newText ?: ""
         if (refreshList) currentPage = 1
 //        searchMoviesUseCase.execute(SearchMoviesParams(currentPage++, searchString), MoviesListObserver(this, refreshList))
     }
 
-    fun cancelSearch() {
-        searchMoviesUseCase.dispose()
-    }
+//    fun cancelSearch() {
+//        //searchMoviesUseCase.dispose()
+//    }
 
-    class MoviesListObserver(private val presenter: MostPopularMoviesPresenter, private val refreshList: Boolean) : DisposableObserver<MovieListEntity>() {
-        override fun onComplete() {
-        }
-
-        override fun onNext(movieListEntity: MovieListEntity) {
-            presenter.manageMovieListEntityReceived(refreshList, movieListEntity)
-            if (movieListEntity.moviesList.isNotEmpty()) {
-                presenter.manageList()
-            } else {
-                presenter.manageEmptyList()
-            }
-        }
-
-        override fun onError(e: Throwable) =
-                presenter.manageEmptyList()
-
-    }
+//    class MoviesListObserver(private val presenter: MostPopularMoviesPresenter, private val refreshList: Boolean) : DisposableObserver<MovieListEntity>() {
+//        override fun onComplete() {
+//        }
+//
+//        override fun onNext(movieListEntity: MovieListEntity) {
+//            presenter.manageMovieListEntityReceived(refreshList, movieListEntity)
+//            if (movieListEntity.moviesList.isNotEmpty()) {
+//                presenter.manageList()
+//            } else {
+//                presenter.manageEmptyList()
+//            }
+//        }
+//
+//        override fun onError(e: Throwable) =
+//                presenter.manageEmptyList()
+//
+//    }
 
 }

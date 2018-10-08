@@ -2,10 +2,10 @@ package com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui
 
 import android.arch.lifecycle.MutableLiveData
 import com.example.domain.entity.MostPopularMoviesParams
-import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoRoutines
+import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.view.base.BaseViewModel
 
-class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCaseCoRoutines) : BaseViewModel() {
+class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCase) : BaseViewModel() {
 
     init {
         addUseCases(useCase)

@@ -4,7 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import com.example.domain.entity.EmptyParams
 import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
-import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoRoutines
+import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.domain.interactor.GetSavedMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
@@ -12,11 +12,11 @@ import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresen
 import com.example.miquelcastanys.cleanlearning.view.base.BaseViewModel
 
 
-class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCaseCoRoutines,
+class MostPopularMoviesViewModel(private val useCaseAllMovies: GetMostPopularMoviesUseCase,
                                  private val localUseCase: GetSavedMoviesUseCase) : BaseViewModel() {
 
     init {
-        addUseCases(useCase, localUseCase)
+        addUseCases(useCaseAllMovies, localUseCase)
     }
 
     var currentPage = 1
@@ -26,12 +26,38 @@ class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCas
     val onDataReceived = MutableLiveData<Boolean>()
     private var loading: Boolean = false
 
+
+    private var searchString = ""
+    var isSearching = false
+
+    fun start() {
+        currentPage = 1
+
+        if (isSearching) {
+            searchMovieByText()
+        } else {
+            getMostPopularMovies(true)
+        }
+    }
+
+    fun searchMovieByText(newText: String? = "", refreshList: Boolean = false) {
+        isSearching = true
+        if (newText != searchString) {
+            /*searchMoviesUseCase.dispose()*/
+            searchString = newText ?: ""
+        }
+        if (refreshList) {
+            currentPage = 1
+            getMostPopularMovies(searchString)
+        }
+    }
+
     @Synchronized
-    fun getMostPopularMovies(refresh: Boolean = false) {
+    private fun getMostPopularMovies(refresh: Boolean = false) {
         if (!loading) {
             loading = true
             if (refresh) currentPage = 1
-            execute(useCase, MostPopularMoviesParams(currentPage++), {
+            execute(useCaseAllMovies, MostPopularMoviesParams(currentPage++), {
                 if (it.result) {
                     manageMovieListEntityReceived(refresh, it)
                 }
@@ -67,7 +93,7 @@ class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCas
         mostPopularMovies.value?.addAll(moviesListResult)
     }
 
-    private var isLastPage: Boolean = false
+    var isLastPage: Boolean = false
 
     private fun setIsLastPage(page: Int, totalPages: Int) {
         isLastPage = page == totalPages
@@ -75,5 +101,9 @@ class MostPopularMoviesViewModel(private val useCase: GetMostPopularMoviesUseCas
 
     private fun removeFooter() {
         mostPopularMovies.value?.removeAll { it is FooterViewViewEntity }
+    }
+
+    fun getMostPopularMovies(searchString: String) {
+        //TODO get by search param
     }
 }

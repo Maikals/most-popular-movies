@@ -1,16 +1,15 @@
 package com.example.data.net
 
 import com.example.data.net.interceptor.RequestInterceptor
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class MovieServiceImpl @Inject constructor(private val authInterceptor: RequestInterceptor) {
+class SearchMoviesServiceAdapter(private val authInterceptor: RequestInterceptor) {
 
-    fun createService(): MostPopularMoviesService {
+    fun createService(): SearchMoviesService {
         val httpClient = OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
                 .connectTimeout(ApiConstants.TIMEOUT_CONNECTION_VALUE, TimeUnit.SECONDS)
@@ -18,8 +17,9 @@ class MovieServiceImpl @Inject constructor(private val authInterceptor: RequestI
                 .writeTimeout(ApiConstants.TIMEOUT_WRITE_VALUE, TimeUnit.SECONDS)
         val builder = Retrofit.Builder()
                 .baseUrl(ApiConstants.BASE_URL)
+                .addCallAdapterFactory(
+                        RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        return builder.client(httpClient.build()).build().create(MostPopularMoviesService::class.java)
+        return builder.client(httpClient.build()).build().create(SearchMoviesService::class.java)
     }
 }

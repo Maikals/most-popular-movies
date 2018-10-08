@@ -20,27 +20,20 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.TranslateAnimation
-import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.adapters.MostPopularMovieListAdapter
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.enumerations.EmptyViewEnumeration
-import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
-import com.example.miquelcastanys.cleanlearning.injector.module.MostPopularMoviesModule
 import com.example.miquelcastanys.cleanlearning.interfaces.MostPopularMoviesActivityFragmentInterface
 import com.example.miquelcastanys.cleanlearning.observe
-import com.example.miquelcastanys.cleanlearning.presenter.MostPopularMoviesPresenter
 import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
 import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.NewActivityDemo
 import kotlinx.android.synthetic.main.fragment_most_popular_movies.*
 import org.koin.android.viewmodel.ext.android.viewModel
-import javax.inject.Inject
 
 
 class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
-    @Inject
-    lateinit var presenter: MostPopularMoviesPresenter
 
     val viewModel: MostPopularMoviesViewModel by viewModel()
 
@@ -64,14 +57,14 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 val visibleItemCount = linearLayoutManager.childCount
                 val totalItemCount = linearLayoutManager.itemCount
                 val pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition()
-                if (!presenter.isLastPage) {
+                if (!viewModel.isLastPage) {
                     if (visibleItemCount + pastVisibleItems >= totalItemCount - 5) {
-                        viewModel.getMostPopularMovies()
+                        viewModel.start()
                     }
                 }
             } else if (linearLayoutManager.findLastVisibleItemPosition() == mostPopularMoviesRV.adapter?.itemCount!! - 1
-                    && !presenter.isLastPage) {
-                viewModel.getMostPopularMovies()
+                    && !viewModel.isLastPage) {
+                viewModel.start()
             }
         }
     }
@@ -107,17 +100,13 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
             }
         }
 
-        presenter.start()
+        viewModel.start()
 
         open_new_activity_button.setOnClickListener {
             startActivity(Intent(activity, NewActivityDemo::class.java))
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        presenter.resume()
-    }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -157,7 +146,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 isSearchExpanded = false
                 animateSearchToolbar(1, false, false)
                 stopScroll()
-                searchClosed()
                 getMostPopularMovies()
                 return true
             }
@@ -168,13 +156,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     private fun stopScroll() {
         mostPopularMoviesRV.stopScroll()
-    }
-
-    override fun setupFragmentComponent() {
-        MostPopularMoviesApplication
-                .applicationComponent
-                .plus(BaseFragmentModule(context!!), MostPopularMoviesModule(this))
-                .inject(this)
     }
 
     override fun showProgressBar(show: Boolean) {
@@ -197,7 +178,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     private fun setRefreshLayoutBehaviour() =
             swipeRefreshLayout.setOnRefreshListener {
-                if (!presenter.isSearching) {
+                if (!viewModel.isSearching) {
                     restartListAnimation()
                 }
                 getData()
@@ -205,7 +186,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     private fun getData() {
         if (isInternetReachable())
-            viewModel.getMostPopularMovies(true)
+            viewModel.start()
         else viewModel.getSavedMovies()
     }
 
@@ -232,14 +213,8 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         emptyView?.visibility = View.VISIBLE
     }
 
-    override fun onPause() {
-        super.onPause()
-        presenter.pause()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        presenter.destroy()
         unattachScrollListener()
     }
 
@@ -255,7 +230,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
             mostPopularMoviesRV?.removeOnScrollListener(onScrollListener)
 
     fun searchMovie(newText: String?) {
-        presenter.searchMovieByText(newText, refreshList = true)
+        viewModel.searchMovieByText(newText, refreshList = true)
     }
 
     fun animateSearchToolbar(numberOfMenuIcon: Int, containsOverflow: Boolean, show: Boolean) {
@@ -362,18 +337,20 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         return result
     }
 
-    fun searchClosed() {
-        presenter.isSearching = false
-        presenter.cancelSearch()
-    }
+//    fun searchClosed() {
+//        isSearching = false
+//        //presenter.cancelSearch()
+//    }
 
     fun getMostPopularMovies() {
-        presenter.start()
+        viewModel.start()
+        showProgressBar(true)
     }
 
     fun showErrorMessage(message: String) {
         Snackbar.make(activity_most_popular_movies_container, message, Snackbar.LENGTH_SHORT).show()
         swipeRefreshLayout?.isRefreshing = false
     }
+
 }
 

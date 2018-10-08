@@ -5,10 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
-import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
-import com.example.miquelcastanys.cleanlearning.injector.module.MostPopularMoviesNewModule
 import com.example.miquelcastanys.cleanlearning.observe
 import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
 import kotlinx.android.synthetic.main.new_activity_demo_fragment.*
@@ -17,19 +14,12 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class NewActivityDemoFragment : BaseFragment() {
 
-    override fun setupFragmentComponent() {
-        MostPopularMoviesApplication
-                .applicationComponent
-                .plus(BaseFragmentModule(context!!), MostPopularMoviesNewModule(this))
-                .inject(this)
-    }
-
     companion object {
         const val TAG = "NewActivityDemoFragment"
         fun newInstance() = NewActivityDemoFragment()
     }
 
-    val newActivityDemoViewModel: NewActivityDemoViewModel by viewModel()
+    private val newActivityDemoViewModel: NewActivityDemoViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {

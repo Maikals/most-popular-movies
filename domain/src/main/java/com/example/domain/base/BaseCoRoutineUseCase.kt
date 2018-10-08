@@ -4,7 +4,6 @@ import com.example.domain.entity.BaseEntity
 import com.example.domain.entity.BaseParams
 import com.example.domain.exceptions.CustomException
 import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.Main
 
 abstract class BaseCoRoutineUseCase<T : BaseEntity, Params : BaseParams> {
 
