@@ -25,17 +25,10 @@ import org.koin.dsl.module.module
 
 
 val viewModels = module {
-    viewModel { NewActivityDemoViewModel(useCase = get(), useCaseRealm = get()) }
-    viewModel { MostPopularMoviesViewModel(localUseCase = get(), useCase = get()) }
-    viewModel { NewActivityDemoViewModel(useCase = get()) }
+    viewModel { NewActivityDemoViewModel(useCase = get(), getSavedMoviesUseCase = get()) }
     viewModel { MostPopularMoviesViewModel(localUseCase = get(), useCaseAllMovies = get()) }
     factory { MostPopularMoviesPresenter() }
 }
-
-//val applicationModule = module {
-//
-//    factory { androidContext() }
-//}
 
 val movieServiceModule = module {
     single { RequestInterceptor() }
@@ -72,4 +65,9 @@ val reachAbilityModule = module {
     single<ReachAbilityDevices> { ReachAbilityDevicesImpl() }
 }
 
-val generalModules = listOf(reachAbilityModule, realmModule, viewModels, movieServiceModule, mostPopularMoviesApiModule, useCasesModule)
+val generalModules = listOf(reachAbilityModule,
+        realmModule,
+        viewModels,
+        movieServiceModule,
+        mostPopularMoviesApiModule,
+        useCasesModule)

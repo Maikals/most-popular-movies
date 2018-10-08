@@ -9,7 +9,7 @@ import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresen
 import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.view.base.BaseViewModel
 
-class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCase, private val useCaseRealm: GetSavedMoviesUseCase) : BaseViewModel() {
+class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCase, private val getSavedMoviesUseCase: GetSavedMoviesUseCase) : BaseViewModel() {
 
     init {
         addUseCases(useCase)
@@ -35,7 +35,7 @@ class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCase,
     }
 
     fun getMovieFromDatabase() {
-        execute(useCaseRealm, EmptyParams(), {
+        execute(getSavedMoviesUseCase, EmptyParams(), {
             if (it.moviesList.isNotEmpty())
                 movie.postValue(MoviesListPresentationMapper.toPresentationObject(it)[0] as MovieViewEntity)
         }, {
