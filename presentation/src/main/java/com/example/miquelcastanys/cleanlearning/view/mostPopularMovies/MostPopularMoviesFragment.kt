@@ -23,7 +23,6 @@ import android.view.animation.TranslateAnimation
 import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.adapters.MostPopularMovieListAdapter
-import com.example.miquelcastanys.cleanlearning.buildViewModel
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.enumerations.EmptyViewEnumeration
 import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
@@ -34,18 +33,16 @@ import com.example.miquelcastanys.cleanlearning.presenter.MostPopularMoviesPrese
 import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
 import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.NewActivityDemo
 import kotlinx.android.synthetic.main.fragment_most_popular_movies.*
+import org.koin.android.viewmodel.ext.android.viewModel
 import javax.inject.Inject
 
 
 class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     @Inject
-    lateinit var factory: MostPopularModelFactory
-
-    @Inject
     lateinit var presenter: MostPopularMoviesPresenter
 
-    lateinit var viewModel: MostPopularMoviesViewModel
+    val viewModel: MostPopularMoviesViewModel by viewModel()
 
     private var searchAction: MenuItem? = null
     var isSearchExpanded: Boolean = false
@@ -87,12 +84,12 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        createViewModel()
+
         setRefreshLayoutBehaviour()
         setRecyclerView()
         setEmptyView()
         setHasOptionsMenu(true)
-        //createViewModel()
+
         getData()
 
         if (mostPopularMoviesRV.adapter == null)
@@ -115,10 +112,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         open_new_activity_button.setOnClickListener {
             startActivity(Intent(activity, NewActivityDemo::class.java))
         }
-    }
-
-    override fun createViewModel() {
-        viewModel = buildViewModel(factory, MostPopularMoviesViewModel::class.java)
     }
 
     override fun onResume() {

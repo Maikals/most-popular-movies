@@ -16,9 +16,6 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 
 class NewActivityDemoFragment : BaseFragment() {
-    override fun createViewModel() {
-
-    }
 
     override fun setupFragmentComponent() {
         MostPopularMoviesApplication
@@ -42,7 +39,6 @@ class NewActivityDemoFragment : BaseFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        createViewModel()
         button_request_movies_new_fragment.setOnClickListener {
             checkReachAbility { result ->
                 if (result) {
