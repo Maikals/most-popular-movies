@@ -18,7 +18,7 @@ import org.koin.dsl.module.module
 
 
 val viewModels = module {
-    viewModel { NewActivityDemoViewModel(useCase = get()) }
+    viewModel { NewActivityDemoViewModel(useCase = get(), useCaseRealm = get()) }
     viewModel { MostPopularMoviesViewModel(localUseCase = get(), useCase = get()) }
 }
 

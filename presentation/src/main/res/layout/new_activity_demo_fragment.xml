@@ -1,45 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/newactivitydemo"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".view.newactivitydemo.NewActivityDemo">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui.NewActivityDemoViewModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/newactivitydemo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:context=".view.newactivitydemo.NewActivityDemo">
 
-        <Button
-            android:id="@+id/button_request_movies_new_fragment"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="get more movies" />
+            android:layout_height="match_parent">
 
-        <TextView
-            android:layout_centerInParent="true"
-            android:id="@+id/message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="NewActivityDemoFragment"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <Button
+                android:id="@+id/button_request_movies_new_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="get more movies" />
 
-        <TextView
-            android:layout_below="@+id/message"
-            android:layout_centerInParent="true"
-            android:id="@+id/counter_request"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="NewActivityDemoFragment"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/counter_request"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/message"
+                android:layout_centerInParent="true"
+                android:text="0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-</android.support.constraint.ConstraintLayout>
+            <TextView
+                android:id="@+id/movieTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.movie.title}"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@+id/get_one_movie_from_database" />
+
+            <Button
+                android:id="@+id/get_one_movie_from_database"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:onClick="@{() -> viewModel.getMovieFromDatabase()}"
+                android:text="Get One Movie From Database" />
+
+
+        </RelativeLayout>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>
