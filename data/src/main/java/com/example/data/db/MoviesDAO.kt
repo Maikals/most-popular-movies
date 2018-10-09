@@ -4,16 +4,14 @@ import com.example.data.entity.GenreRealmEntity
 import com.example.data.entity.MovieRealmEntity
 import com.example.domain.entity.MovieEntity
 import io.realm.RealmList
-import javax.inject.Inject
 
-class MoviesDAO @Inject constructor(private val realmManager: RealmManager) {
+class MoviesDAO(private val realmManager: RealmManager) {
     fun <T> getMostPopularList(block: (List<MovieRealmEntity>) -> T): T? =
             realmManager.executeTransaction { realm ->
                 realmManager.getAllEntities(realm, MovieRealmEntity::class.java) {
                     block(it)
                 }
             }
-
 
     fun setMostPopularList(moviesList: List<MovieEntity>) =
             realmManager.executeTransaction { realm ->

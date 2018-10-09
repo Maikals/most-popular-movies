@@ -1,15 +1,15 @@
-package com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui
+package com.example.miquelcastanys.cleanlearning.view.newactivitydemo
 
 import android.arch.lifecycle.MutableLiveData
 import com.example.domain.entity.EmptyParams
 import com.example.domain.entity.MostPopularMoviesParams
-import com.example.domain.interactor.GetMostPopularMoviesUseCaseCoRoutines
 import com.example.domain.interactor.GetSavedMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.entities.MovieViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
+import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.view.base.BaseViewModel
 
-class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCaseCoRoutines, private val useCaseRealm: GetSavedMoviesUseCase) : BaseViewModel() {
+class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCase, private val getSavedMoviesUseCase: GetSavedMoviesUseCase) : BaseViewModel() {
 
     init {
         addUseCases(useCase)
@@ -35,7 +35,7 @@ class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCaseC
     }
 
     fun getMovieFromDatabase() {
-        execute(useCaseRealm, EmptyParams(), {
+        execute(getSavedMoviesUseCase, EmptyParams(), {
             if (it.moviesList.isNotEmpty())
                 movie.postValue(MoviesListPresentationMapper.toPresentationObject(it)[0] as MovieViewEntity)
         }, {

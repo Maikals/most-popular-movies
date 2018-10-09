@@ -5,21 +5,19 @@ import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import com.example.data.reachability.ReachAbilityManager
 import com.example.domain.base.Log
-import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import kotlinx.android.synthetic.main.activity_base.*
-import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface {
 
     protected var currentTag: String? = null
     protected var currentFragment: Fragment? = null
 
-    @Inject
-    lateinit var reachAbilityManager: ReachAbilityManager
 
-    override fun isInternetReachable(): Boolean = reachAbilityManager.isBackOfficeReachable
+
+    override fun isInternetReachable(): Boolean = ReachAbilityManager.isBackOfficeReachable
 
     companion object {
         private const val CURRENT_FRAGMENT_TAG: String = "currentTag"
@@ -29,7 +27,6 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base)
         setToolbar()
-        setupActivityComponent()
         initializeFragmentAndTAG(savedInstanceState)
         beginTransaction()
     }
@@ -37,15 +34,15 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface
     override fun onResume() {
         super.onResume()
 
-        reachAbilityManager.setBackOfficeReachAbleListener {
+        ReachAbilityManager.setBackOfficeReachAbleListener {
             onConnectivityChanges(it)
         }
 
-        reachAbilityManager.setReachAbleListenerVUE {
+        ReachAbilityManager.setReachAbleListenerVUE {
             onConnectivityChangesVUE(it)
         }
 
-        reachAbilityManager.setReachAbleListenerFUSE {
+        ReachAbilityManager.setReachAbleListenerFUSE {
             onConnectivityChangesFUSE(it)
         }
 
@@ -93,9 +90,6 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface
 
     abstract fun createFragmentAndSettingTAG()
 
-    private fun setupActivityComponent() {
-        MostPopularMoviesApplication.applicationComponent.inject(this)
-    }
 
     protected fun setToolbarTitle(title: String) {
         supportActionBar?.title = title
@@ -106,14 +100,14 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityFragmentInterface
     }
 
     override fun stopTimerVue() {
-        reachAbilityManager.stopTimerVUE()
+        ReachAbilityManager.stopTimerVUE()
     }
 
     override fun startTimerVue() {
-        reachAbilityManager.startTimerVUE()
+        ReachAbilityManager.startTimerVUE()
     }
 
     override fun checkReachAbility(block: (Boolean) -> Unit) {
-        reachAbilityManager.checkBackOfficeReachAbility(block)
+        ReachAbilityManager.checkBackOfficeReachAbility(block)
     }
 }

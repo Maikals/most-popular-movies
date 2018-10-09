@@ -1,10 +1,9 @@
 package com.example.data.db
 
 import com.example.data.entity.GenreRealmEntity
-import javax.inject.Inject
 
 
-class GenreDao @Inject constructor(private val realmManager: RealmManager) {
+class GenreDao(private val realmManager: RealmManager) {
 
     fun getGenreEntityByID(genreId: Int): GenreRealmEntity? =
             realmManager.executeTransaction { realm ->

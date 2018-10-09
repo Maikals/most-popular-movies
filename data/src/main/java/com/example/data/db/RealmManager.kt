@@ -4,18 +4,17 @@ import android.content.Context
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmObject
-import javax.inject.Inject
-import javax.inject.Singleton
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 
-@Singleton
-class RealmManager @Inject constructor(context: Context) {
+object RealmManager : KoinComponent {
 
-    companion object {
-        private const val REALM_KEY = "8ab5dd83af7c1b20452927c339eb7701e0d727c31682978c7c92a8193b11e595"
-    }
+    private val androidContext: Context by inject()
+
+    private const val REALM_KEY = "8ab5dd83af7c1b20452927c339eb7701e0d727c31682978c7c92a8193b11e595"
 
     init {
-        Realm.init(context)
+        Realm.init(androidContext)
         Realm.setDefaultConfiguration(RealmConfiguration.Builder()
                 .name("moviesRealmDatabase.realm")
                 .schemaVersion(6)

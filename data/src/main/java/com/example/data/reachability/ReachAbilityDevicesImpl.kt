@@ -7,9 +7,8 @@ import com.example.domain.repository.ReachAbilityDevices
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
-import javax.inject.Inject
 
-class ReachAbilityDevicesImpl @Inject constructor() : ReachAbilityDevices {
+class ReachAbilityDevicesImpl : ReachAbilityDevices {
 
     companion object {
         private const val TAG = "ReachAbilityDevicesImpl"

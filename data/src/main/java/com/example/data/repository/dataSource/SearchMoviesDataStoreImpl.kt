@@ -1,16 +1,14 @@
 package com.example.data.repository.dataSource
 
 import com.example.data.entity.mapper.MovieListMapper
-import com.example.data.net.SearchMoviesService
+import com.example.data.net.SearchMoviesServiceAdapter
 import com.example.domain.entity.MovieListEntity
-import io.reactivex.Single
-import javax.inject.Inject
 
 
-class SearchMoviesDataStoreImpl @Inject constructor(private val searchMoviesService: SearchMoviesService) : SearchMoviesDataStore {
-    override fun getSearchMoviesList(searchText: String, page: Int): Single<MovieListEntity> =
-        searchMoviesService
-                .getSearchMovies(searchText, page)
-                .map { MovieListMapper.toDomainObject(it) }
+class SearchMoviesDataStoreImpl(private val searchMoviesService: SearchMoviesServiceAdapter) : SearchMoviesDataStore {
+    override suspend fun getSearchMoviesList(searchText: String, page: Int): MovieListEntity =
+            MovieListMapper.toDomainObject(searchMoviesService
+                    .createService().getSearchMovies(searchText, page).await())
+
 
 }

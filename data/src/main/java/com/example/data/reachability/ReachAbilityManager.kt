@@ -1,4 +1,4 @@
-package com.example.miquelcastanys.cleanlearning.view.base
+package com.example.data.reachability
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -12,21 +12,22 @@ import com.example.domain.entity.EmptyParams
 import com.example.domain.entity.InternetAddressParams
 import com.example.domain.interactor.CheckDevicesReachAbilityUseCase
 import com.example.domain.interactor.CheckInternetConnectionUseCase
-import javax.inject.Inject
-import javax.inject.Singleton
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 
-@Singleton
-class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckInternetConnectionUseCase,
-                                              private val useCaseDevice: CheckDevicesReachAbilityUseCase) : BroadcastReceiver() {
+
+object ReachAbilityManager : BroadcastReceiver(), KoinComponent {
+
+    private val useCaseBackEnd: CheckInternetConnectionUseCase by inject()
+
+    private val useCaseDevice: CheckDevicesReachAbilityUseCase by inject()
 
     private val timer: CountDownTimer
     private var isTimerRunning: Boolean = false
 
-    companion object {
-        private const val PERIOD = Long.MAX_VALUE
-        private const val COUNT_DOWN_TIMER = 2000L
-        private const val TAG: String = "ReachAbilityManager"
-    }
+    private const val PERIOD = Long.MAX_VALUE
+    private const val COUNT_DOWN_TIMER = 2000L
+    private const val TAG: String = "ReachAbilityManager"
 
     init {
         /**
@@ -46,14 +47,14 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
 
     /**BackOffice Address with its listener and its block setter*/
     var isBackOfficeReachable: Boolean = false
-    private lateinit var backOfficeReachabilityListener: (Boolean) -> Unit
+    private lateinit var backOfficeReachAbilityListener: (Boolean) -> Unit
 
     /**
      * @param host the url to check or evaluate the back office reach ability
      * @param block function to set and later on answer the state changes
      * */
     fun setBackOfficeReachAbleListener(block: (Boolean) -> Unit) {
-        backOfficeReachabilityListener = block
+        backOfficeReachAbilityListener = block
     }
 
     /**First device UDP logic Address with its listener and its block setter
@@ -67,7 +68,7 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
         }
 
     private var vueDevice = InternetAddressParams(vueHost, BROADCAST_PORT_VUE)
-    private lateinit var vueReachabilityListener: (Boolean) -> Unit
+    private lateinit var vueReachAbilityListener: (Boolean) -> Unit
     var checkVueReachAbleEnabled = false //boolean to enable disable checking the host
 
     /**
@@ -75,7 +76,7 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
      * @param block function to set and later on answer the state changes
      * */
     fun setReachAbleListenerVUE(block: (Boolean) -> Unit) {
-        vueReachabilityListener = block
+        vueReachAbilityListener = block
     }
 
     /**Second device UDP logic Address with its listener and its block setter
@@ -138,10 +139,10 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
 
     private fun broadcastOffToListeners() {
 
-        backOfficeReachabilityListener(false)
+        backOfficeReachAbilityListener(false)
 
         if (checkVueReachAbleEnabled) {
-            vueReachabilityListener(false)
+            vueReachAbilityListener(false)
         }
 
         if (checkFuseReachAbleEnabled) {
@@ -167,7 +168,7 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
         checkBackOfficeReachAbility {
             if (it != isBackOfficeReachable) {
                 isBackOfficeReachable = it
-                backOfficeReachabilityListener(isBackOfficeReachable)
+                backOfficeReachAbilityListener(isBackOfficeReachable)
             }
         }
     }
@@ -182,7 +183,7 @@ class ReachAbilityManager @Inject constructor(private val useCaseBackEnd: CheckI
 
             if (it.result != vueDevice.isReachAble) {
                 vueDevice.isReachAble = it.result
-                vueReachabilityListener(vueDevice.isReachAble)
+                vueReachAbilityListener(vueDevice.isReachAble)
             }
 
         }, {

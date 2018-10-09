@@ -1,4 +1,4 @@
-package com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui
+package com.example.miquelcastanys.cleanlearning.view.newactivitydemo
 
 import android.databinding.DataBindingUtil
 import android.os.Bundle
@@ -6,11 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.example.miquelcastanys.cleanlearning.MostPopularMoviesApplication
 import com.example.miquelcastanys.cleanlearning.R
 import com.example.miquelcastanys.cleanlearning.databinding.NewActivityDemoFragmentBinding
-import com.example.miquelcastanys.cleanlearning.injector.module.BaseFragmentModule
-import com.example.miquelcastanys.cleanlearning.injector.module.MostPopularMoviesNewModule
 import com.example.miquelcastanys.cleanlearning.observe
 import com.example.miquelcastanys.cleanlearning.view.base.BaseFragment
 import kotlinx.android.synthetic.main.new_activity_demo_fragment.*
@@ -18,13 +15,6 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 
 class NewActivityDemoFragment : BaseFragment() {
-
-    override fun setupFragmentComponent() {
-        MostPopularMoviesApplication
-                .applicationComponent
-                .plus(BaseFragmentModule(context!!), MostPopularMoviesNewModule(this))
-                .inject(this)
-    }
 
     companion object {
         const val TAG = "NewActivityDemoFragment"

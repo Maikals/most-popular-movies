@@ -4,7 +4,7 @@ import android.arch.paging.PagedListAdapter
 import android.support.v7.util.DiffUtil
 import android.view.ViewGroup
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
-import com.example.miquelcastanys.cleanlearning.view.MovieViewHolder
+import com.example.miquelcastanys.cleanlearning.view.viewholder.MovieViewHolder
 
 class MostPopularMoviePagedListAdapter(private val movieList: List<BaseListViewEntity>) : PagedListAdapter<BaseListViewEntity, MovieViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {

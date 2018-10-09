@@ -3,10 +3,9 @@ package com.example.data.repository
 import com.example.data.repository.dataSource.MostPopularMoviesStore
 import com.example.domain.entity.MovieListEntity
 import com.example.domain.repository.MostPopularMoviesRepository
-import javax.inject.Inject
 
 
-class MostPopularMoviesRepositoryImpl @Inject constructor(private val mostPopularMoviesStore: MostPopularMoviesStore) : MostPopularMoviesRepository {
+class MostPopularMoviesRepositoryImpl (private val mostPopularMoviesStore: MostPopularMoviesStore) : MostPopularMoviesRepository {
     override suspend fun getSavedMostPopularMovies(): MovieListEntity =
             mostPopularMoviesStore.getMostPopularMoviesLocal()
 
