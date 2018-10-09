@@ -5,7 +5,7 @@
 
         <variable
             name="viewModel"
-            type="com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui.NewActivityDemoViewModel" />
+            type="com.example.miquelcastanys.cleanlearning.view.newactivitydemo.NewActivityDemoViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"

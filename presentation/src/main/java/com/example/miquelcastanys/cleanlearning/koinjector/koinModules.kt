@@ -17,9 +17,8 @@ import com.example.domain.repository.MostPopularMoviesRepository
 import com.example.domain.repository.ReachAbility
 import com.example.domain.repository.ReachAbilityDevices
 import com.example.domain.repository.SearchMoviesRepository
-import com.example.miquelcastanys.cleanlearning.presenter.MostPopularMoviesPresenter
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesViewModel
-import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui.NewActivityDemoViewModel
+import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.NewActivityDemoViewModel
 import org.koin.android.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 
@@ -27,7 +26,7 @@ import org.koin.dsl.module.module
 val viewModels = module {
     viewModel { NewActivityDemoViewModel(useCase = get(), getSavedMoviesUseCase = get()) }
     viewModel { MostPopularMoviesViewModel(localUseCase = get(), useCaseAllMovies = get()) }
-    factory { MostPopularMoviesPresenter() }
+
 }
 
 val movieServiceModule = module {

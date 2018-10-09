@@ -4,7 +4,7 @@ import android.content.Context
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import com.example.miquelcastanys.cleanlearning.koinjector.generalModules
-import com.example.miquelcastanys.cleanlearning.view.base.ReachAbilityManager
+import com.example.data.reachability.ReachAbilityManager
 import org.koin.android.ext.android.startKoin
 import org.koin.standalone.KoinComponent
 

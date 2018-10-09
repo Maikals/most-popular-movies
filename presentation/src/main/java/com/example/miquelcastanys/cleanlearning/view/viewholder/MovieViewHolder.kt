@@ -1,4 +1,4 @@
-package com.example.miquelcastanys.cleanlearning.view
+package com.example.miquelcastanys.cleanlearning.view.viewholder
 
 import android.support.v7.widget.RecyclerView
 import android.view.View

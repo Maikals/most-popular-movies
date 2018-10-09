@@ -1,4 +1,4 @@
-package com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui
+package com.example.miquelcastanys.cleanlearning.view.newactivitydemo
 
 import android.databinding.DataBindingUtil
 import android.os.Bundle

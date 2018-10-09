@@ -1,4 +1,4 @@
-package com.example.miquelcastanys.cleanlearning.view.base
+package com.example.data.reachability
 
 import android.content.BroadcastReceiver
 import android.content.Context

@@ -3,7 +3,6 @@ package com.example.miquelcastanys.cleanlearning.view.newactivitydemo
 import android.os.Bundle
 import android.widget.Toast
 import com.example.miquelcastanys.cleanlearning.view.base.BaseActivity
-import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui.NewActivityDemoFragment
 
 class NewActivityDemo : BaseActivity()  {
 
@@ -16,7 +15,7 @@ class NewActivityDemo : BaseActivity()  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTitle("CACA DE LA VACA")
+        setTitle("Movie detail")
     }
 
 

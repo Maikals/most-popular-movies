@@ -1,4 +1,4 @@
-package com.example.miquelcastanys.cleanlearning.view.newactivitydemo.ui
+package com.example.miquelcastanys.cleanlearning.view.newactivitydemo
 
 import android.arch.lifecycle.MutableLiveData
 import com.example.domain.entity.EmptyParams
