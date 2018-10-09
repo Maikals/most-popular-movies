@@ -3,7 +3,6 @@ package com.example.data.db
 import android.content.Context
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.RealmObject
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 
@@ -28,22 +27,6 @@ object RealmManager : KoinComponent {
                 realm.executeTransaction { result = fn(it) }
                 result
             }
-
-
-    fun <T : RealmObject> saveEntities(realm: Realm, entityList: List<T>) {
-        entityList.forEach {
-            realm.copyToRealmOrUpdate(it)
-        }
-    }
-
-    fun <T : RealmObject> getEntity(realm: Realm, entityType: Class<T>, idField: String, id: Int): T? =
-            realm.where(entityType).equalTo(idField, id).findFirst()
-
-    fun <T : RealmObject, S> getAllEntities(realm: Realm, entityType: Class<T>, block: (List<T>) -> S): S =
-            block(realm.where(entityType).findAll().toList())
-
-    fun <T : RealmObject> entityExists(realm: Realm, entityType: Class<T>, idField: String, id: Int): Boolean =
-            getEntity(realm, entityType, idField, id) != null
 
     @Synchronized
     private fun <T> openRealmInstance(fn: (Realm) -> T): T {

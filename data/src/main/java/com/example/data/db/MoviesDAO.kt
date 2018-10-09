@@ -2,20 +2,23 @@ package com.example.data.db
 
 import com.example.data.entity.GenreRealmEntity
 import com.example.data.entity.MovieRealmEntity
+import com.example.data.extensions.entityExists
+import com.example.data.extensions.getAllEntities
+import com.example.data.extensions.saveEntities
 import com.example.domain.entity.MovieEntity
 import io.realm.RealmList
 
 class MoviesDAO(private val realmManager: RealmManager) {
     fun <T> getMostPopularList(block: (List<MovieRealmEntity>) -> T): T? =
             realmManager.executeTransaction { realm ->
-                realmManager.getAllEntities(realm, MovieRealmEntity::class.java) {
+                realm.getAllEntities(MovieRealmEntity::class.java) {
                     block(it)
                 }
             }
 
     fun setMostPopularList(moviesList: List<MovieEntity>) =
             realmManager.executeTransaction { realm ->
-                realmManager.saveEntities(realm, moviesList.asSequence()
+                realm.saveEntities(moviesList.asSequence()
                         .map {
                             createMovieRealmEntityFromMovieEntity(it)
                         }.toList())
@@ -44,6 +47,6 @@ class MoviesDAO(private val realmManager: RealmManager) {
 
     fun movieExists(movieId: Int): Boolean =
             realmManager.executeTransaction { realm ->
-                realmManager.entityExists(realm, MovieRealmEntity::class.java, "id", movieId)
+                realm.entityExists(MovieRealmEntity::class.java, "id", movieId)
             }!!
 }
