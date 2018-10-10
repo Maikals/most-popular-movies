@@ -12,7 +12,7 @@ public class CustomLog  {
 
     private ReachAbilityServiceAdapter serviceAdapter = inject(ReachAbilityServiceAdapter.class);
 
-    public static void wtf(String tag, Throwable throwable) {
+    public void wtf(String tag, Throwable throwable) {
         Log.wtf(tag, throwable);
     }
 
