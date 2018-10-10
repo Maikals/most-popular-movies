@@ -7,7 +7,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Instrumented d, which will execute on an Android device.
+ * Instrumented d, which will createService on an Android device.
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */

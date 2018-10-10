@@ -32,20 +32,19 @@ import kotlinx.android.synthetic.main.fragment_most_popular_movies.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
 
-class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
-
-
-    val viewModel: MostPopularMoviesViewModel by viewModel()
-
-    private var searchAction: MenuItem? = null
-    var isSearchExpanded: Boolean = false
-
-    private var mostPopularMoviesActivityFragmentInterface: MostPopularMoviesActivityFragmentInterface? = null
+class MostPopularMoviesFragment : BaseFragment() {
 
     companion object {
         const val TAG = "MostPopularMoviesFragment"
         fun newInstance(): MostPopularMoviesFragment = MostPopularMoviesFragment()
     }
+
+    val viewModel: MostPopularMoviesViewModel by viewModel()
+    private var searchAction: MenuItem? = null
+
+    var isSearchExpanded: Boolean = false
+
+    private var mostPopularMoviesActivityFragmentInterface: MostPopularMoviesActivityFragmentInterface? = null
 
     private val linearLayoutManager: LinearLayoutManager = LinearLayoutManager(context,
             LinearLayoutManager.VERTICAL,
@@ -59,12 +58,12 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
                 val pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition()
                 if (!viewModel.isLastPage) {
                     if (visibleItemCount + pastVisibleItems >= totalItemCount - 5) {
-                        viewModel.start()
+                        viewModel.loadMoreMovies()
                     }
                 }
             } else if (linearLayoutManager.findLastVisibleItemPosition() == mostPopularMoviesRV.adapter?.itemCount!! - 1
                     && !viewModel.isLastPage) {
-                viewModel.start()
+                viewModel.loadMoreMovies()
             }
         }
     }
@@ -145,6 +144,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
             override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
                 isSearchExpanded = false
                 animateSearchToolbar(1, false, false)
+                viewModel.isSearching = false
                 stopScroll()
                 getMostPopularMovies()
                 return true
@@ -158,7 +158,7 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         mostPopularMoviesRV.stopScroll()
     }
 
-    override fun showProgressBar(show: Boolean) {
+    fun showProgressBar(show: Boolean) {
         swipeRefreshLayout?.let {
             if (swipeRefreshLayout.isRefreshing) {
                 if (!show)
@@ -190,40 +190,20 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         else viewModel.getSavedMovies()
     }
 
-    override fun restartListAnimation() {
+    fun restartListAnimation() {
         (mostPopularMoviesRV?.adapter as? MostPopularMovieListAdapter)?.restartLastPosition()
     }
 
     private fun attachScrollListener() =
             mostPopularMoviesRV?.addOnScrollListener(onScrollListener)
 
-    override fun showRecyclerView() {
+    fun showRecyclerView() {
         mostPopularMoviesRV?.visibility = View.VISIBLE
-    }
-
-    override fun hideRecyclerView() {
-        mostPopularMoviesRV?.visibility = View.GONE
-    }
-
-    override fun hideEmptyView() {
-        emptyView?.visibility = View.GONE
-    }
-
-    override fun showEmptyView() {
-        emptyView?.visibility = View.VISIBLE
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         unattachScrollListener()
-    }
-
-    override fun setItems(moviesList: List<BaseListViewEntity>) {
-
-//        mostPopularMoviesRV?.let {
-//            if (mostPopularMoviesRV.adapter == null) mostPopularMoviesRV.adapter = MostPopularMovieListAdapter(moviesList)
-//            mostPopularMoviesRV.adapter.notifyDataSetChanged()
-//        }
     }
 
     private fun unattachScrollListener() =
@@ -336,11 +316,6 @@ class MostPopularMoviesFragment : BaseFragment(), MostPopularMoviesView {
         a.recycle()
         return result
     }
-
-//    fun searchClosed() {
-//        isSearching = false
-//        //presenter.cancelSearch()
-//    }
 
     fun getMostPopularMovies() {
         viewModel.start()

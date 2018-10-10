@@ -17,16 +17,17 @@ import com.example.domain.repository.MostPopularMoviesRepository
 import com.example.domain.repository.ReachAbility
 import com.example.domain.repository.ReachAbilityDevices
 import com.example.domain.repository.SearchMoviesRepository
+import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesUseCaseWrapper
 import com.example.miquelcastanys.cleanlearning.view.mostPopularMovies.MostPopularMoviesViewModel
 import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.NewActivityDemoViewModel
+import com.example.miquelcastanys.cleanlearning.view.newactivitydemo.NewActivityUseCaseWrapper
 import org.koin.android.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 
 
 val viewModels = module {
-    viewModel { NewActivityDemoViewModel(useCase = get(), getSavedMoviesUseCase = get()) }
-    viewModel { MostPopularMoviesViewModel(localUseCase = get(), useCaseAllMovies = get()) }
-
+    viewModel { NewActivityDemoViewModel(useCaseWrapper = get()) }
+    viewModel { MostPopularMoviesViewModel(useCaseWrapper = get()) }
 }
 
 val movieServiceModule = module {
@@ -56,6 +57,11 @@ val useCasesModule = module {
     factory { CheckDevicesReachAbilityUseCase(reachAbilityDevices = get()) }
 }
 
+val wrapperUseCasesModule = module {
+    factory { MostPopularMoviesUseCaseWrapper(localUseCase = get(), getSearchMoviesUseCase = get(), useCaseAllMovies = get()) }
+    factory { NewActivityUseCaseWrapper(getMostPopularMoviesUseCase = get(), getSavedMoviesUseCase = get()) }
+}
+
 val reachAbilityModule = module {
     single { ReachAbilityRequestInterceptor() }
     single { ReachAbilityServiceAdapter(reachAbilityRequestInterceptor = get()) }
@@ -69,4 +75,5 @@ val generalModules = listOf(reachAbilityModule,
         viewModels,
         movieServiceModule,
         mostPopularMoviesApiModule,
-        useCasesModule)
+        useCasesModule,
+        wrapperUseCasesModule)

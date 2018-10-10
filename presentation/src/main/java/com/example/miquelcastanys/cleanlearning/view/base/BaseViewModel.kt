@@ -8,18 +8,13 @@ import com.example.domain.entity.BaseEntity
 import com.example.domain.entity.BaseParams
 import com.example.domain.exceptions.CustomException
 
-abstract class BaseViewModel : ViewModel() {
+abstract class BaseViewModel(baseUseCaseWrapper: BaseUseCaseWrapper) : ViewModel() {
 
-    private var list: ArrayList<BaseCoRoutineUseCase<BaseEntity, BaseParams>> = arrayListOf()
-
-    protected fun <T : BaseCoRoutineUseCase<*, *>> addUseCases(vararg useCase: T) =
-            useCase.forEach { useCaseIterator ->
-                list.add(useCaseIterator as BaseCoRoutineUseCase<BaseEntity, BaseParams>)
-            }
+    private val useCasesList: ArrayList<BaseCoRoutineUseCase<BaseEntity, BaseParams>> = baseUseCaseWrapper.list
 
     override fun onCleared() {
         super.onCleared()
-        list.forEach { it.cancel() }
+        useCasesList.forEach { it.cancel() }
     }
 
     fun <T : BaseEntity, Params : BaseParams> execute(useCase: BaseCoRoutineUseCase<T, Params>, params: Params, onResultOk: (T) -> Unit, onResultError: (String) -> Unit) {

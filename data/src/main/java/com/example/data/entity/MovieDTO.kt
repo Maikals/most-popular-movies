@@ -1,7 +1,7 @@
 package com.example.data.entity
 
 
-class MovieDTO(val vote_count: Int?,
+data class MovieDTO(val vote_count: Int?,
                         val id: Int?,
                         val video: Boolean?,
                         val vote_average: Double?,

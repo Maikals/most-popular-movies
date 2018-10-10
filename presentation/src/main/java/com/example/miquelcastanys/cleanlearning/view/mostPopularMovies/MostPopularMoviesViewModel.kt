@@ -1,31 +1,27 @@
 package com.example.miquelcastanys.cleanlearning.view.mostPopularMovies
 
 import android.arch.lifecycle.MutableLiveData
+import com.example.domain.base.Log
 import com.example.domain.entity.EmptyParams
 import com.example.domain.entity.MostPopularMoviesParams
 import com.example.domain.entity.MovieListEntity
-import com.example.domain.interactor.GetMostPopularMoviesUseCase
-import com.example.domain.interactor.GetSavedMoviesUseCase
+import com.example.domain.entity.SearchMoviesParams
 import com.example.miquelcastanys.cleanlearning.entities.BaseListViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.FooterViewViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
 import com.example.miquelcastanys.cleanlearning.view.base.BaseViewModel
 
 
-class MostPopularMoviesViewModel(private val useCaseAllMovies: GetMostPopularMoviesUseCase,
-                                 private val localUseCase: GetSavedMoviesUseCase) : BaseViewModel() {
+class MostPopularMoviesViewModel(var useCaseWrapper: MostPopularMoviesUseCaseWrapper)
+    : BaseViewModel(useCaseWrapper) {
 
-    init {
-        addUseCases(useCaseAllMovies, localUseCase)
-    }
-
-    var currentPage = 1
+    private var currentPage = 1
     val mostPopularMovies = MutableLiveData<ArrayList<BaseListViewEntity>>().apply {
         value = ArrayList()
     }
+
     val onDataReceived = MutableLiveData<Boolean>()
     private var loading: Boolean = false
-
 
     private var searchString = ""
     var isSearching = false
@@ -34,22 +30,29 @@ class MostPopularMoviesViewModel(private val useCaseAllMovies: GetMostPopularMov
         currentPage = 1
 
         if (isSearching) {
-            searchMovieByText()
+            searchMovieByText(searchString, true)
         } else {
             getMostPopularMovies(true)
+        }
+    }
+
+    fun loadMoreMovies() {
+        if (isSearching) {
+            searchMovieByText()
+        } else {
+            getMostPopularMovies()
         }
     }
 
     fun searchMovieByText(newText: String? = "", refreshList: Boolean = false) {
         isSearching = true
         if (newText != searchString) {
-            /*searchMoviesUseCase.dispose()*/
             searchString = newText ?: ""
         }
         if (refreshList) {
             currentPage = 1
-            getMostPopularMovies(searchString)
         }
+        getMostPopularMovies(searchString)
     }
 
     @Synchronized
@@ -57,7 +60,7 @@ class MostPopularMoviesViewModel(private val useCaseAllMovies: GetMostPopularMov
         if (!loading) {
             loading = true
             if (refresh) currentPage = 1
-            execute(useCaseAllMovies, MostPopularMoviesParams(currentPage++), {
+            execute(useCaseWrapper.useCaseAllMovies, MostPopularMoviesParams(currentPage++), {
                 if (it.result) {
                     manageMovieListEntityReceived(refresh, it)
                 }
@@ -71,7 +74,7 @@ class MostPopularMoviesViewModel(private val useCaseAllMovies: GetMostPopularMov
     }
 
     fun getSavedMovies() {
-        execute(localUseCase, EmptyParams(), {
+        execute(useCaseWrapper.localUseCase, EmptyParams(), {
             if (it.result)
                 manageMovieListEntityReceived(true, it)
             onDataReceived.postValue(it.result)
@@ -103,7 +106,27 @@ class MostPopularMoviesViewModel(private val useCaseAllMovies: GetMostPopularMov
         mostPopularMovies.value?.removeAll { it is FooterViewViewEntity }
     }
 
+    private var lastSearch = ""
+
+    @Synchronized
     fun getMostPopularMovies(searchString: String) {
-        //TODO get by search param
+        lastSearch = searchString
+
+        execute(useCaseWrapper.getSearchMoviesUseCase, SearchMoviesParams(currentPage, searchString), {
+
+            if (lastSearch == it.searchedString) {
+                Log.e("ViewModel", "lastSearch == it.searchedString are equals, then show new response: ${it.result}")
+                if (it.result) {
+                    manageMovieListEntityReceived(true, it)
+                }
+            }
+            onDataReceived.postValue(it.result)
+
+        }, {
+            Log.e("ViewModel", "Exception: $it")
+            onDataReceived.postValue(false)
+        })
+
     }
+
 }

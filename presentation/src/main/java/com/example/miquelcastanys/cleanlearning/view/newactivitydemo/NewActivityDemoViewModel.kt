@@ -3,25 +3,19 @@ package com.example.miquelcastanys.cleanlearning.view.newactivitydemo
 import android.arch.lifecycle.MutableLiveData
 import com.example.domain.entity.EmptyParams
 import com.example.domain.entity.MostPopularMoviesParams
-import com.example.domain.interactor.GetSavedMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.entities.MovieViewEntity
 import com.example.miquelcastanys.cleanlearning.entities.mapper.MoviesListPresentationMapper
-import com.example.domain.interactor.GetMostPopularMoviesUseCase
 import com.example.miquelcastanys.cleanlearning.view.base.BaseViewModel
 
-class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCase, private val getSavedMoviesUseCase: GetSavedMoviesUseCase) : BaseViewModel() {
-
-    init {
-        addUseCases(useCase)
-    }
+class NewActivityDemoViewModel(private var useCaseWrapper: NewActivityUseCaseWrapper) : BaseViewModel(useCaseWrapper) {
 
     val movie = MutableLiveData<MovieViewEntity>()
     var requestCounter = MutableLiveData<Int>()
-    var currentPage = 1
+    private var currentPage = 1
     val onDataReceived = MutableLiveData<Boolean>()
 
     fun getMovies() {
-        execute(useCase, MostPopularMoviesParams(currentPage++), {
+        execute(useCaseWrapper.getMostPopularMoviesUseCase, MostPopularMoviesParams(currentPage++), {
             if (it.result) {
                 if (requestCounter.value == null) requestCounter.value = 0
                 requestCounter.value = requestCounter.value?.plus(1)
@@ -35,16 +29,11 @@ class NewActivityDemoViewModel(private val useCase: GetMostPopularMoviesUseCase,
     }
 
     fun getMovieFromDatabase() {
-        execute(getSavedMoviesUseCase, EmptyParams(), {
+        execute(useCaseWrapper.getSavedMoviesUseCase, EmptyParams(), {
             if (it.moviesList.isNotEmpty())
                 movie.postValue(MoviesListPresentationMapper.toPresentationObject(it)[0] as MovieViewEntity)
         }, {
             onDataReceived.postValue(false)
         })
     }
-
-//    override fun onCleared() {
-//        super.onCleared()
-//        useCase.cancel()
-//    }
 }

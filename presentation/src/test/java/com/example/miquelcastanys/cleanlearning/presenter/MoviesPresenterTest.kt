@@ -101,7 +101,7 @@ class MoviesPresenterTest : UnitTest() {
 //            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
 //            observer.onError(Throwable())
 //            null
-//        }.`when`(mostPopularMoviesUseCase).execute(any(), any())
+//        }.`when`(mostPopularMoviesUseCase).createService(any(), any())
 //    }
 //
 //    @Suppress("UNCHECKED_CAST")
@@ -110,7 +110,7 @@ class MoviesPresenterTest : UnitTest() {
 //            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
 //            observer.onNext(createMoviesListEntity())
 //            null
-//        }.`when`(mostPopularMoviesUseCase).execute(any(), any())
+//        }.`when`(mostPopularMoviesUseCase).createService(any(), any())
 //    }
 //
 //    @Suppress("UNCHECKED_CAST")
@@ -119,7 +119,7 @@ class MoviesPresenterTest : UnitTest() {
 //            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
 //            observer.onNext(movieListEntity)
 //            null
-//        }.`when`(mostPopularMoviesUseCase).execute(any(), any())
+//        }.`when`(mostPopularMoviesUseCase).createService(any(), any())
 //    }
 //
 //    @Suppress("UNCHECKED_CAST")
@@ -128,7 +128,7 @@ class MoviesPresenterTest : UnitTest() {
 //            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
 //            observer.onNext(createMoviesListEntity())
 //            null
-//        }.`when`(searchMoviesUseCase).execute(any(), any())
+//        }.`when`(searchMoviesUseCase).createService(any(), any())
 //    }
 //
 //    @Suppress("UNCHECKED_CAST")
@@ -137,7 +137,7 @@ class MoviesPresenterTest : UnitTest() {
 //            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
 //            observer.onNext(movieListEntity)
 //            null
-//        }.`when`(searchMoviesUseCase).execute(any(), any())
+//        }.`when`(searchMoviesUseCase).createService(any(), any())
 //    }
 //
 //
@@ -147,7 +147,7 @@ class MoviesPresenterTest : UnitTest() {
 //            val observer = it.arguments[1] as DisposableObserver<MovieListEntity>
 //            observer.onError(Throwable())
 //            null
-//        }.`when`(searchMoviesUseCase).execute(any(), any())
+//        }.`when`(searchMoviesUseCase).createService(any(), any())
 //    }
 //
 //    private fun createMoviesListEntity(): MovieListEntity =

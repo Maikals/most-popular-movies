@@ -56,8 +56,9 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params : BaseParams> {
      * Cancels the current job execution.
      */
     fun cancel() {
-        GlobalScope.launch(Dispatchers.Default) {
-            job?.cancelAndJoin()
-        }
+        //commented at the moment because it does not handle call errors when viewmodel dies and cannot answer the onResponse back.
+//        GlobalScope.launch(Dispatchers.Default) {
+//            job?.cancelAndJoin()
+//        }
     }
 }
