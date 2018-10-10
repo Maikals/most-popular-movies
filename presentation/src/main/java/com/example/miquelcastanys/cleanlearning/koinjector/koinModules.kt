@@ -2,6 +2,7 @@ package com.example.miquelcastanys.cleanlearning.koinjector
 
 import com.example.data.db.MoviesDAO
 import com.example.data.db.RealmManager
+import com.example.data.javatest.CustomLog
 import com.example.data.net.MovieServiceAdapter
 import com.example.data.net.SearchMoviesServiceAdapter
 import com.example.data.net.interceptor.ReachAbilityRequestInterceptor
@@ -62,6 +63,7 @@ val wrapperUseCasesModule = module {
     factory { NewActivityUseCaseWrapper(getMostPopularMoviesUseCase = get(), getSavedMoviesUseCase = get()) }
 }
 
+@JvmField
 val reachAbilityModule = module {
     single { ReachAbilityRequestInterceptor() }
     single { ReachAbilityServiceAdapter(reachAbilityRequestInterceptor = get()) }
@@ -70,7 +72,13 @@ val reachAbilityModule = module {
     single<ReachAbilityDevices> { ReachAbilityDevicesImpl() }
 }
 
-val generalModules = listOf(reachAbilityModule,
+@JvmField
+val javaTestModule = module{
+    single { CustomLog() }
+}
+
+val generalModules = listOf(javaTestModule,
+        reachAbilityModule,
         realmModule,
         viewModels,
         movieServiceModule,

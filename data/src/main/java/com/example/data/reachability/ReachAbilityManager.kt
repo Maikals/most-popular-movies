@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.CountDownTimer
+import com.example.data.javatest.CustomLog
 import com.example.domain.base.Log
 import com.example.domain.entity.EmptyParams
 import com.example.domain.entity.InternetAddressParams
@@ -18,9 +19,12 @@ import org.koin.standalone.inject
 
 object ReachAbilityManager : BroadcastReceiver(), KoinComponent {
 
+    private val testJavaCustomLog : CustomLog by inject()
     private val useCaseBackEnd: CheckInternetConnectionUseCase by inject()
 
     private val useCaseDevice: CheckDevicesReachAbilityUseCase by inject()
+
+    private val context: Context by inject()
 
     private val timer: CountDownTimer
     private var isTimerRunning: Boolean = false
@@ -43,6 +47,7 @@ object ReachAbilityManager : BroadcastReceiver(), KoinComponent {
 
             override fun onFinish() = Unit
         }
+        registerReceiver()
     }
 
     /**BackOffice Address with its listener and its block setter*/
@@ -103,8 +108,8 @@ object ReachAbilityManager : BroadcastReceiver(), KoinComponent {
     /**
      * @param context general Context to register the receiver
      * */
-    fun registerReceiver(context: Context?) {
-        context?.registerReceiver(this, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
+    private fun registerReceiver() {
+        context.registerReceiver(this, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
     }
 
     /**Var to evaluate if the network is connected or not*/
@@ -222,7 +227,7 @@ object ReachAbilityManager : BroadcastReceiver(), KoinComponent {
         if (isTimerRunning) {
             timer.cancel()
             isTimerRunning = false
-            Log.d(TAG, "timer VUE reach ability stopped.")
+            testJavaCustomLog.d(TAG, "timer VUE reach ability stopped.")
         }
     }
 

@@ -6,7 +6,6 @@ import android.support.multidex.MultiDexApplication
 import com.example.data.reachability.ReachAbilityManager
 import com.example.miquelcastanys.cleanlearning.koinjector.generalModules
 import org.koin.android.ext.android.startKoin
-import org.koin.standalone.KoinComponent
 
 
 class MostPopularMoviesApplication : MultiDexApplication() {
@@ -15,8 +14,6 @@ class MostPopularMoviesApplication : MultiDexApplication() {
         super.onCreate()
 
         startKoin(this, generalModules)
-
-        ReachAbilityManager.registerReceiver(this)
 
         ReachAbilityManager.apply {
             vueHost = "192.168.1.20"
