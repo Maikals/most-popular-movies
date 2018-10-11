@@ -3,11 +3,12 @@ package com.example.domain.base
 import com.example.domain.entity.BaseEntity
 import com.example.domain.entity.BaseParams
 import com.example.domain.exceptions.CustomException
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.*
 
 abstract class BaseCoRoutineUseCase<T : BaseEntity, Params : BaseParams> {
 
     private var job: Job? = null
+    private var asyncJob: Job? = null
 
     companion object {
         private const val TAG: String = "BaseCoRoutineUseCase"
@@ -15,31 +16,35 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params : BaseParams> {
 
     fun executeAsync(params: Params, block: suspend CoroutineScope.(T) -> Unit,
                      blockError: (CustomException?) -> Unit) {
-        job = launchAsync {
+        job = launchAsync({
+
             val result = buildRepoCall(params)
             launchUI { block(result) }
-        }
-        job?.invokeOnCompletion {
-            if (it != null) blockError(CustomException(it))
-        }
+        }, blockError)
+
     }
 
-    fun executeBlocking(params: Params, block: suspend CoroutineScope.(T) -> Unit,
-                        blockError: (CustomException?) -> Unit) {
-        job = runBlocking(Dispatchers.Default) {
-            val result = buildRepoCall(params)
-            launchUI { block(result) }
-        }
-    }
+//    fun executeBlocking(params: Params, block: suspend CoroutineScope.(T) -> Unit,
+//                        blockError: (CustomException?) -> Unit) {
+//        job = runBlocking(Dispatchers.Default) {
+//            val result = buildRepoCall(params)
+//            launchUI { block(result) }
+//        }
+//    }
 
     abstract suspend fun buildRepoCall(params: Params): T
+
+    private fun createExceptionHandler(blockError: (CustomException?) -> Unit) =
+            CoroutineExceptionHandler { _, e ->
+                launchUI { blockError(CustomException(e)) }
+            }
 
     /**
      * Launch a coroutine in a new Thread.
      * @param block The block that will be executed inside coroutine
      */
-    private fun launchAsync(block: suspend CoroutineScope.() -> Unit): Job =
-            GlobalScope.async(Dispatchers.Default) {
+    private fun launchAsync(block: suspend CoroutineScope.() -> Unit, blockError: (CustomException?) -> Unit): Job =
+            GlobalScope.async(Dispatchers.Default + createExceptionHandler(blockError)) {
                 block()
             }
 
@@ -56,9 +61,6 @@ abstract class BaseCoRoutineUseCase<T : BaseEntity, Params : BaseParams> {
      * Cancels the current job execution.
      */
     fun cancel() {
-        //commented at the moment because it does not handle call errors when viewmodel dies and cannot answer the onResponse back.
-//        GlobalScope.launch(Dispatchers.Default) {
-//            job?.cancelAndJoin()
-//        }
+        job?.cancel()
     }
 }

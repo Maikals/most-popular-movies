@@ -40,6 +40,9 @@ allprojects {
         mavenCentral()
         google()
         jcenter()
+        maven {
+            url "http://dl.bintray.com/kotlin/kotlin-eap"
+        }
     }
 }
 
@@ -112,4 +115,7 @@ dependencies {
 }
 repositories {
     mavenCentral()
+    maven {
+        url "http://dl.bintray.com/kotlin/kotlin-eap"
+    }
 }

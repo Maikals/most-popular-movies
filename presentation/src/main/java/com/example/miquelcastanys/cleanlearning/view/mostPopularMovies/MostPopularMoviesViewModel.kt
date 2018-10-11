@@ -111,6 +111,7 @@ class MostPopularMoviesViewModel(var useCaseWrapper: MostPopularMoviesUseCaseWra
     @Synchronized
     fun getMostPopularMovies(searchString: String) {
         lastSearch = searchString
+        useCaseWrapper.getSearchMoviesUseCase.cancel()
 
         execute(useCaseWrapper.getSearchMoviesUseCase, SearchMoviesParams(currentPage, searchString), {
 

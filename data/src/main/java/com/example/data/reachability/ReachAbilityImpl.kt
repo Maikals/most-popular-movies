@@ -3,7 +3,7 @@ package com.example.data.reachability
 import com.example.data.repository.dataSource.ReachAbilityDataStore
 import com.example.domain.entity.ReachAbilityEntity
 import com.example.domain.repository.ReachAbility
-import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.delay
 
 class ReachAbilityImpl(private val reachAbilityDataStore: ReachAbilityDataStore) : ReachAbility {
 

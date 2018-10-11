@@ -1,7 +1,7 @@
 package com.example.data.net
 
 import com.example.data.entity.MovieListDTO
-import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.Deferred
 import retrofit2.http.GET
 import retrofit2.http.Query
 
